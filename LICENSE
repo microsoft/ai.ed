@@ -1,10 +1,12 @@
-    This project has two parts which are licensed differently.  
+PLEASE NOTE: This project depends on a separately licensed component that, when included
+into this project at build time, may limit what you can do with builds of this project.
     
     All of the source code in this repository is available under the MIT License
     (given below), BUT the project depends on the Microsoft PROSE SDK which is
-    available only in binary form and which has its own license.  The PROSE SDK
-    dependency is satisfied through a nuget package available on nuget.org.  You
-    can see that license here: 
+    available only in binary form and is not licensed under the MIT License.  The 
+    PROSE SDK dependency is satisfied through a nuget package available on nuget.org.
+    The PROSE SDK is licensed under a Microsoft proprietary license, the terms of 
+    which are available here: 
         https://www.nuget.org/packages/Microsoft.ProgramSynthesis/7.27.0/License
     
     MIT License
