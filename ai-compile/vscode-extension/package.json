@@ -1,0 +1,82 @@
+{
+	"name": "python-hints",
+	"displayName": "Hello World",
+	"description": "Dummy Extension",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.54.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onLanguage:python",
+		"onCommand:python-hints.getFix"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"title": "Get Help",
+				"command": "python-hints.getFix"
+			},
+			{
+				"title": "Enable CodeLens",
+				"command": "python-hints.enableCodeLens",
+				"category": "CodeLens Sample"
+			},
+			{
+				"title": "Disable Codelens",
+				"command": "python-hints.disableCodeLens",
+				"category": "CodeLens Sample"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "python-hints.getFix",
+				"key": "ctrl+f1",
+				"mac": "cmd+f1",
+				"when": "editorTextFocus"
+			}
+		],
+		"configuration": {
+            "properties": {
+                "python-hints.enableCodeLens": {
+                    "type": "boolean",
+                    "default": true
+                },
+				"python-hints.webServerPath": {
+					"type": "string",
+					"default": "https://localhost:44362/api/values"
+				}
+            }
+        }
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.1.3",
+		"@types/mocha": "^8.0.4",
+		"@types/node": "^12.11.7",
+		"@types/vscode": "^1.54.0",
+		"@typescript-eslint/eslint-plugin": "^4.14.1",
+		"@typescript-eslint/parser": "^4.14.1",
+		"eslint": "^7.19.0",
+		"glob": "^7.1.6",
+		"mocha": "^8.2.1",
+		"tsc": "^1.20150623.0",
+		"typescript": "^4.2.4",
+		"vscode-test": "^1.5.0"
+	},
+	"dependencies": {
+		"axios": "^0.21.1",
+		"npm": "^7.10.0",
+		"tsc-watch": "^4.2.9"
+	}
+}
