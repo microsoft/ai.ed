@@ -25,11 +25,16 @@ export class CodelensProvider implements vscode.CodeLensProvider {
             const filePath = document.uri.fsPath;
             const fixes: t.Fix = storageManager.getValue<t.DocumentStore>( filePath )?.fixes;
             fixes?.forEach( fix => {
-                const position = new vscode.Position( fix.lineNo - 1, 0 );
+                const position = new vscode.Position( fix.lineNo, 0 );
                 const range = document.getWordRangeAtPosition( position, new RegExp( this.regex ) );
+                var text: string = "";
+                if( fix.repairLine[0] === " " ) {
+                    text = "<TAB> ";
+                }
+                text = text + fix.repairLine;
                 let command = {
                     command : "python-hints.codelensAction",
-                    title : fix.lineText
+                    title : text
                 };
                 if( range ) {
                     this.codeLenses.push( new vscode.CodeLens( range, command ) );

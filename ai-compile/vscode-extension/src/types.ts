@@ -1,3 +1,4 @@
+
 export interface Payload {
     source: string;
     lastEditLine: number;
@@ -5,12 +6,17 @@ export interface Payload {
 
 export interface Response {
     lineNo: number;
-    lineText: string;
+    repairLine: string;
+    feedbacks: string;
+    repairClasses: string;
 }
 
 export interface DocumentStore {
-    filePath: string,   // placeholder for additional fields
+    // TODO: Can this be made private? Does it make sense?
+    filePath: string,
     fixes: Fix    
 }
 
+
 export type Fix = ( Response[] | undefined );
+
