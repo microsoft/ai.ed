@@ -69,9 +69,10 @@ namespace webserver
             string ip = ipAddress.ToString();
             string path = Path.Combine(env.ContentRootPath, "Helpers");
             path = Path.Combine(path, "Brain.py");
+            string pyMacerPath = Path.Combine(env.ContentRootPath, "..\\..\\PyMacer");
             var runCmd = new RunCmd(true);
 
-            var result = runCmd.Run(path, "MACER", ip, port);
+            var result = runCmd.Run(path, pyMacerPath, "MACER", ip, port);
         }
     }
 }

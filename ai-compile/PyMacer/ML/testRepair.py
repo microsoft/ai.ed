@@ -2,7 +2,9 @@ import sys, os
 from datetime import datetime
 from difflib import SequenceMatcher
 from statistics import mean
-sys.path.insert(1, "C:\\Users\\t-fshaikh\\OneDrive - Microsoft\\Documents\\anonymous\\Microsoft\\ai.ed\\ai-compile\\PyMacer")
+sys_path = os.path.abspath(".\\")
+print(sys_path)
+sys.path.insert(1, sys_path)
 from ML.data.DataAnalysis import getAlignDict
 from ML.rcAnalysis import getFeedbackFromRepairClass, getLineDiff
 

@@ -1,7 +1,9 @@
 ﻿import json
-import sys
+import sys, os
 # insert at 1, 0 is the script path (or '' in REPL)
-sys.path.insert(1, "C:\\Users\\t-fshaikh\\OneDrive - Microsoft\\Documents\\anonymous\\PyMACER")
+
+sys.path.insert(1, sys.argv[4])
+
 from ML.testRepair import repairProgram
 import socketserver
 import socket
