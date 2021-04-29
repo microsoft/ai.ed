@@ -1,6 +1,6 @@
 # PyMACER README
 
-PyMACER is the python adaptation of [MACER: A Modular Framework for Accelerated Compilation Error Repair.] (https://github.com/purushottamkar/macer).
+PyMACER is the python adaptation of [MACER: A Modular Framework for Accelerated Compilation Error Repair.](https://github.com/purushottamkar/macer).
 It is an active project in its early stages.
 
 
