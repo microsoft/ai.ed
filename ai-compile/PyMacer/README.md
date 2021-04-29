@@ -12,8 +12,10 @@ Python Interpreter (preferably v3 and above)
 Follow the following steps to setup PyMACER.
 
 1. Create a virtual environment 
-	`pip install virtualenv`
-	`virtualenv pymacer`
+	```
+	pip install virtualenv
+	virtualenv pymacer
+	```
 2. Activate the venv
 	`pymacer\Scripts\activate`
 3. Install all dependencies
