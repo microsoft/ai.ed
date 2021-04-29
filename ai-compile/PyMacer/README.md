@@ -16,9 +16,9 @@ Follow the following steps to setup PyMACER.
 	pip install virtualenv
 	virtualenv pymacer
 	```
-2. Activate the venv
+2. Activate the venv: 
 	`pymacer\Scripts\activate`
-3. Install all dependencies
+3. Install all dependencies: 
 	`pip install -r requirements.txt`
 
 ## Questions, issues, and contributions
