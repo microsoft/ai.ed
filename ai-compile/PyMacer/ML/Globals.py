@@ -1,5 +1,6 @@
 import os
 import pickle
+import tensorflow as tf
 from Common import ConfigFile as CF
 
 flags = {
@@ -42,15 +43,6 @@ with open(dir_name + '/new_encoder','rb') as file:
     new_encoder=pickle.load(file)
 with open(dir_name + '/flat_rankers','rb') as file:
     flat_rankers=pickle.load(file)
-with open(dir_name + '/repl_or_not','rb') as file:
-    repl_or_not=pickle.load(file)
-    repl_or_not._make_predict_function()
-with open(dir_name + '/ins_del_model','rb') as file:
-    ins_del_model=pickle.load(file)
-    ins_del_model._make_predict_function()
-with open(dir_name + '/repl_class_model','rb') as file:
-    repl_class_model=pickle.load(file)
-    repl_class_model._make_predict_function()
 with open(dir_name + '/repl_encoder','rb') as file:
     repl_encoder=pickle.load(file)
 with open(dir_name + '/ins_class_model','rb') as file:
@@ -73,6 +65,24 @@ with open(dir_name + '/del_clusters','rb') as file:
     del_clusters=pickle.load(file)
 with open(dir_name + '/rest_clusters','rb') as file:
     rest_clusters=pickle.load(file)
+
+# === Tf models ====
+
+repl_or_not = tf.keras.models.load_model(dir_name + slash + 'repl_or_not')
+ins_del_model = tf.keras.models.load_model(dir_name + slash + 'ins_del_model')
+repl_class_model = tf.keras.models.load_model(dir_name + slash + 'repl_class_model')
+
+# with open(dir_name + '/repl_or_not','rb') as file:
+#     repl_or_not=pickle.load(file)
+#     repl_or_not._make_predict_function()
+# with open(dir_name + '/ins_del_model','rb') as file:
+#     ins_del_model=pickle.load(file)
+#     ins_del_model._make_predict_function()
+# with open(dir_name + '/repl_class_model','rb') as file:
+#     repl_class_model=pickle.load(file)
+#     repl_class_model._make_predict_function()
+
+
 # if compiler_features:
 #     with open(dir_name + '/tfid_type_err', 'rb') as file:
 #         tfid_type_err = pickle.load( file)
