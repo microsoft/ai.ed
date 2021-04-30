@@ -1,0 +1,20 @@
+# IDE Specific
+/venv
+/.idea
+/try.py
+/__pycache__
+
+# ANTLr Grammar Files
+/AntlrGrammar/antlr-4.9.2-complete.jar
+/AntlrGrammar/__pycache__/
+
+# Project Local
+/output/
+/ML/__pycache__
+/ML/data/__pycache__
+/Symbolic/__pycache__
+/Common/__pycache__
+/ML/micro_data
+
+# venv
+/pymacer

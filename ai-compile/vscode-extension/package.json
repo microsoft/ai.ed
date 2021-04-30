@@ -11,14 +11,26 @@
 	],
 	"activationEvents": [
 		"onLanguage:python",
-		"onCommand:python-hints.getFix"
+		"onCommand:python-hints.toggleHints"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"title": "Get Help",
-				"command": "python-hints.getFix"
+				"title": "Toggle Hints",
+				"command": "python-hints.toggleHints",
+				"icon": {
+					"light": "./media/bulb-black-icon.svg",
+					"dark": "./media/bulb-yellow-icon.svg"
+				}
+			},
+			{
+				"title": "Toggle Highlight",
+				"command": "python-hints.toggleHighlight",
+				"icon": {
+					"light": "./media/highlighter-circle-icon.svg",
+					"dark": "./media/highlighter-circle-icon.svg"
+				}
 			},
 			{
 				"title": "Enable CodeLens",
@@ -33,24 +45,52 @@
 		],
 		"keybindings": [
 			{
-				"command": "python-hints.getFix",
+				"command": "python-hints.toggleHints",
 				"key": "ctrl+f1",
 				"mac": "cmd+f1",
+				"when": "editorTextFocus"
+			},
+			{
+				"command": "python-hints.toggleHighlight",
+				"key": "ctrl+f2",
+				"mac": "cmd+f2",
 				"when": "editorTextFocus"
 			}
 		],
 		"configuration": {
-            "properties": {
-                "python-hints.enableCodeLens": {
-                    "type": "boolean",
-                    "default": true
-                },
+			"properties": {
+				"python-hints.enableCodeLens": {
+					"type": "boolean",
+					"default": false
+				},
 				"python-hints.webServerPath": {
 					"type": "string",
 					"default": "https://localhost:44362/api/values"
+				},
+				"python-hints.diagnosticLevel": {
+					"type": "integer",
+					"default": 1
+				},
+				"python-hints.activeHighlight": {
+					"type": "boolean",
+					"default": false
 				}
-            }
-        }
+			}
+		},
+		"menus": {
+			"editor/title": [
+				{
+					"when": "resourceLangId == python",
+					"command": "python-hints.toggleHints",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == python",
+					"command": "python-hints.toggleHighlight",
+					"group": "navigation"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
