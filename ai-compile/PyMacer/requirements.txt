@@ -1,9 +1,9 @@
 antlr4-python3-runtime==4.9.2
-clang==6.0.0.2
-pandas==0.24.2
-scikit-learn==0.21.1
-keras==2.2.4
-prettytable==0.7.2
+h5py==2.10.0
 edlib==1.2.4
-tensorflow==1.14
-numpy==1.16.2
+Keras==2.4.3
+numpy==1.19.5
+pandas==1.2.4 
+prettytable==0.7.2
+scikit-learn==0.24.1
+tensorflow==2.4.1

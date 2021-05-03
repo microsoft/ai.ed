@@ -584,7 +584,7 @@ print("OvA Classification Done.")
 
 toc = timer()
 print("Time Taken: " + str(toc - tic))
-model_dir = CF.models_dir + "/model"
+model_dir = CF.models_dir + CF.slash + "model"
 
 if wo_err_id:
     model_dir += '_woerrid'
@@ -617,12 +617,6 @@ with open(model_dir + '/new_encoder', 'wb') as file:
     pickle.dump(new_encoder, file)
 with open(model_dir + '/flat_rankers', 'wb') as file:
     pickle.dump(flat_rankers, file)
-with open(model_dir + '/repl_or_not', 'wb') as file:
-    pickle.dump(repl_or_not, file)
-with open(model_dir + '/ins_del_model', 'wb') as file:
-    pickle.dump(ins_del_model, file)
-with open(model_dir + '/repl_class_model', 'wb') as file:
-    pickle.dump(repl_class_model, file)
 with open(model_dir + '/repl_encoder', 'wb') as file:
     pickle.dump(repl_encoder, file)
 with open(model_dir + '/ins_class_model', 'wb') as file:
@@ -645,4 +639,11 @@ with open(model_dir + '/del_clusters', 'wb') as file:
     pickle.dump(del_clusters, file)
 with open(model_dir + '/rest_clusters', 'wb') as file:
     pickle.dump(rest_clusters, file)
+
+# ===== TF model =====
+repl_or_not.save(model_dir + CF.slash + 'repl_or_not')
+ins_del_model.save(model_dir + CF.slash + 'ins_del_model')
+repl_class_model.save(model_dir + CF.slash + 'repl_class_model')
+
+
 print("Model Saved.")

@@ -1,4 +1,0 @@
-WebServer/bin/*
-WebServer/obj/*
-WebServer/WebServer/bin
-WebServer/WebServer/obj

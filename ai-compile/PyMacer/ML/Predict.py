@@ -92,19 +92,22 @@ def test(src_line, errs, predAtK, err_msg, gold_repair_classes):
 
     ins_dist = get_dist(ins_clusters, enc_tmp_feat_vector)
     msk = get_ins_mask()
-    ins_dist = np.delete(ins_dist, msk, 1)
+    if msk.shape[0] > 0:
+        ins_dist = np.delete(ins_dist, msk, 1)
     ins_pred = 0.2 * ins_dist + 0.8 * ins_pred #+ 0.1 * ins_cmp_pred
     ins_pred = ins_pred * (1 - repl_p) * noRepl[1]
 
     del_dist = get_dist(del_clusters, enc_tmp_feat_vector)
     msk = get_del_mask()
-    del_dist = np.delete(del_dist, msk, 1)
+    if msk.shape[0] > 0:
+        del_dist = np.delete(del_dist, msk, 1)
     del_pred = 0.2 * del_dist + 0.8 * del_pred # + 0.1 * del_cmp_pred
     del_pred = del_pred * (1 - repl_p) * noRepl[2]
 
     rest_dist = get_dist(rest_clusters, enc_tmp_feat_vector)
     msk = get_rest_mask()
-    rest_dist = np.delete(rest_dist, msk, 1)
+    if msk.shape[0] > 0:
+        rest_dist = np.delete(rest_dist, msk, 1)
     rest_pred = 0.2 * rest_dist + 0.8 * rest_pred #+ 0.1 * rest_cmp_pred
     rest_pred = rest_pred * (1 - repl_p) * noRepl[0]
 

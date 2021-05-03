@@ -1,10 +1,8 @@
 
-name = int(input("Enter your name"))
-age = int(input("Enter your age"))
+number = str(input("Enter a number")
+print("You chose ", number)
 
-print("Hello ", name)
-
-if age <= 18:
-    print("can vote")
-else age < 18:
-    print("can't vote")
+if number == 42:
+    print("Correct!! You win.")
+else:
+    print("Sorry. You loose")
