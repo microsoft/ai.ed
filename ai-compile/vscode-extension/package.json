@@ -98,7 +98,9 @@
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
 		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js"
+		"test": "node ./out/test/runTest.js",
+		"prettier": "prettier --check src/**/*.ts",
+		"prettier:fix": "prettier --write src/**/*.ts"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.3",
@@ -110,7 +112,7 @@
 		"eslint": "^7.19.0",
 		"glob": "^7.1.6",
 		"mocha": "^8.2.1",
-		"tsc": "^1.20150623.0",
+		"prettier": "^2.2.1",
 		"typescript": "^4.2.4",
 		"vscode-test": "^1.5.0"
 	},
