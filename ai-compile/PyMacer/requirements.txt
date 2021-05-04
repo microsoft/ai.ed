@@ -1,6 +1,7 @@
 antlr4-python3-runtime==4.9.2
 h5py==2.10.0
 edlib==1.2.4
+Flask==1.1.2
 Keras==2.4.3
 numpy==1.19.5
 pandas==1.2.4 
