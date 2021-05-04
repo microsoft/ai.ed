@@ -813,6 +813,14 @@ def string_escape(s, encoding='utf-8'):
             .encode('latin1')  # 1:1 mapping back to bytes
             .decode(encoding))  # Decode original encoding
 
+def reset_timers():
+    Globals.abstraction = 0
+    Globals.concretization = 0
+    Globals.compile_freq = 0
+    Globals.compile_time = 0
+    Globals.predict = 0
+    Globals.indent = 0
+
 
 def repairProgram(fname, predAtK, source=''):
     if source == "":
@@ -825,6 +833,7 @@ def repairProgram(fname, predAtK, source=''):
     srcLines = srcText.splitlines()
     srcLinesOld = deepcopy(srcLines)
 
+    reset_timers()
 
     errSet = ClusterError.getErrSetStr(AllErrs, srcCodeObj)
 
@@ -892,8 +901,8 @@ def repairProgram(fname, predAtK, source=''):
     print("Compile time , freq", Globals.compile_time, Globals.compile_freq)
     print("indent time", Globals.indent)
     print("Macer predict time ", Globals.predict)
-    print(changeLines)
-    print("Edit diffs", allEditDiffs)
+    # print(changeLines)
+    # print("Edit diffs", allEditDiffs)
     return correctedLines, changeLines, compiled, repair_classes, feedbacks, allEditDiffs
 
 

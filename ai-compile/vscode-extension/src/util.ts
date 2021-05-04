@@ -8,6 +8,7 @@ import * as https from "https";
 import { requestTimeOut, shellCmdTimeOut } from "./constants";
 import * as t from "./types";
 import * as fs from "fs";
+import * as c from "./constants";
 
 export class Document implements t.DocumentStore {
   private _filePath: string;
@@ -86,7 +87,10 @@ export async function getFix(baseURL: string, data: t.Payload): Promise<t.Fix> {
     // console.log(response.data);
     return response.data as t.Fix;
   } catch (error) {
-    // console.error(error);
+    if (c.DEBUG) {
+      console.error(error);
+    }
+
     return undefined;
   }
 }
