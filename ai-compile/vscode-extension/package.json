@@ -65,7 +65,7 @@
 				},
 				"python-hints.webServerPath": {
 					"type": "string",
-					"default": "https://localhost:44362/api/values"
+					"default": "http://127.0.0.1:5000/getfixes"
 				},
 				"python-hints.diagnosticLevel": {
 					"type": "integer",
