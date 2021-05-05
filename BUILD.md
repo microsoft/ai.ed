@@ -15,7 +15,7 @@ Both of these components are found in the `ai-compile` directory.
 
 ## PyMACER
 
-PyMACER uses the edlib package, which wraps a C++ library. This package does not have pre-built Windows binaries ([Issue #178: Binary wheels for Windows](https://github.com/Martinsos/edlib/issues/178)), so you will need to be built from source during `pip install`. To prepare for this, verify that you have the "Desktop development with C++" workload selected in the Visual Studio 2019 installer.
+PyMACER uses the edlib package, which wraps a C++ library. This package does not have pre-built Windows binaries ([Issue #178: Binary wheels for Windows](https://github.com/Martinsos/edlib/issues/178)), so you will need to build from source during `pip install`. To prepare for this, verify that you have the "Desktop development with C++" workload selected in the Visual Studio 2019 installer.
 
 Then, perform the following commands using the `x64 Native Tools Command Prompt for VS 2019` command prompt so that Python will have access to the required C++ build tools.
 
