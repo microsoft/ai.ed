@@ -13,10 +13,10 @@ def client():
 
 
 def test_syntaxerror_request(client):
-    rv = client.post("/getfixes", json={"source": 'print("Hello world")'})
+    resp = client.post("/getfixes", json={"source": 'print("Hello world")'})
     assert False
 
 
 def test_noerror_request(client):
-    rv = client.post("/getfixes", json={"source": 'print("Hello world")'})
+    resp = client.post("/getfixes", json={"source": 'print("Hello world")'})
     assert False
