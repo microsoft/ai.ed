@@ -1,6 +1,6 @@
 import unittest
 import pytest
-
+import json
 import server
 
 
@@ -13,10 +13,24 @@ def client():
 
 
 def test_syntaxerror_request(client):
-    resp = client.post("/getfixes", json={"source": 'print("Hello world")'})
-    assert False
+    resp = client.post("/getfixes", json={"source": "name = int(input(\"Enter your name\"))\r\n"
+                                                    "age = int(input(\"Enter your age\"))\r\n\r\n"
+                                                    "print(\"Hello \", name)\r\n\r\n"
+                                                    "if age >= 18:\r\n"
+                                                    "    print(\"can vote\")\r\n"
+                                                    "else age < 18:\r\n"
+                                                    "    print(\"can't vote\")"})
+    data = json.loads(resp.data)
+
+    assert len(data) == 1
+    assert "lineNo" in data[0]
+    assert "repairLine" in data[0]
+    assert "repair_classes" in data[0]
+    assert "feedbacks" in data[0]
+    # assert "editDist" in data[0]
 
 
 def test_noerror_request(client):
     resp = client.post("/getfixes", json={"source": 'print("Hello world")'})
-    assert False
+    data = json.loads(resp.data)
+    assert len(data) == 0
