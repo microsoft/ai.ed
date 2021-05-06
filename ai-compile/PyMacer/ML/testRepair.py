@@ -174,7 +174,7 @@ def repairErrLine(srcCodeObj, srcTokenizedCode, symbTable, repairLines, repairAb
         predLine, tempIsConcretized = ConcreteConverter.attemptConcretization(srcCodeObj, srcTokenizedCode, symbTable, predAbsLine, lineNum,
                                                                               debug, inferTypes)
         Globals.concretization += timer() - start_concrete
-        predLines[lineNum - 1] = utils.joinList(predLine, joinStr=' ')
+        predLines[lineNum - 1] = utils.joinConcrete(predLine, joinStr=' ')
 
         # Concretization success?
         isConcretized = utils.NoneAnd(isConcretized, tempIsConcretized)
