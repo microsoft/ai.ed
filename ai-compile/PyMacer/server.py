@@ -22,15 +22,17 @@ def getFixes():
         fname, predAtk, source
     )
     print("predict time ", timer() - start)
-    return_dict = []
+    return_dict = {}
+    lineRepairs = []
     for i in range(len(predLines)):
         tmp_dict = dict()
         tmp_dict["lineNo"] = lineNums[i]
         tmp_dict["repairLine"] = predLines[i]
-        tmp_dict["repair_classes"] = repair_classes[i]
-        tmp_dict["feedbacks"] = feedbacks[i]
+        tmp_dict["repairClasses"] = repair_classes[i]
+        tmp_dict["feedback"] = feedbacks[i]
         # tmp_dict['editDiffs'] = editDiffs[i]
-        return_dict.append(tmp_dict)
+        lineRepairs.append(tmp_dict)
+    return_dict["repairs"] = lineRepairs
     return_value = json.dumps(return_dict)
     print(return_value)
 

@@ -84,8 +84,8 @@ export async function getFix(baseURL: string, data: t.Payload): Promise<t.Fix> {
       timeout: requestTimeOut,
       httpsAgent: agent,
     });
-    // console.log(response.data);
-    return response.data as t.Fix;
+    // console.log("response", response.data.repairs);
+    return response.data.repairs as t.Fix;
   } catch (error) {
     if (c.DEBUG) {
       console.error(error);
