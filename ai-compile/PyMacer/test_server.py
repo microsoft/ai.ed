@@ -22,15 +22,21 @@ def test_syntaxerror_request(client):
                                                     "    print(\"can't vote\")"})
     data = json.loads(resp.data)
 
-    assert len(data) == 1
-    assert "lineNo" in data[0]
-    assert "repairLine" in data[0]
-    assert "repair_classes" in data[0]
-    assert "feedbacks" in data[0]
+    print(data)
+    assert "repairs" in data
+    assert len(data["repairs"]) == 1
+
+    repairs = data["repairs"]
+    assert "lineNo" in repairs[0]
+    assert "repairLine" in repairs[0]
+    assert "repairClasses" in repairs[0]
+    assert "feedback" in repairs[0]
     # assert "editDist" in data[0]
 
 
 def test_noerror_request(client):
     resp = client.post("/getfixes", json={"source": 'print("Hello world")'})
     data = json.loads(resp.data)
-    assert len(data) == 0
+    print(data)
+    assert "repairs" in data
+    assert len(data["repairs"]) == 0
