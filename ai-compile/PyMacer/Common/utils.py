@@ -1,5 +1,7 @@
 from copy import deepcopy
 import pandas as pd
+
+from Symbolic import DataStructs
 from Symbolic.DataStructs import *
 
 
@@ -33,6 +35,16 @@ def joinLL(lists, joinStrWord=' ', joinStrLine='\n', func=str):
     listStrs = [joinList(li, joinStrWord, func) for li in lists]
     return joinList(listStrs, joinStrLine, func)
 
+def joinConcrete(li, joinStr=' ', func=str):
+    rstr = ""
+    for ele in li:
+        if ele == DataStructs.INDENT_SYMBOL * DataStructs.INDENT_SIZE:
+            rstr += func(ele)
+        else:
+            rstr += func(ele) + " "
+    if len(rstr) > 0 and rstr[-1] == " ":
+        rstr = rstr[:-1]
+    return rstr
 
 def toInt(stri):
     if stri is None:
