@@ -4,7 +4,7 @@ from AntlrGrammar.Python3Parser import Python3Parser
 from ML.Globals import ins_encoder, del_encoder, repl_encoder, rest_encoder
 from Symbolic import DataStructs, AbstractHelper
 from Symbolic.ConcreteToken import LITERALS, TYPE_SYMB
-from Symbolic.DataStructs import EditDiff
+from Symbolic.DataStructs import EditDiff, Feedback
 
 SPECIAL_TOKENS = ['LITERAL', 'NAME', 'SKIP_', 'UNKNOWN_CHAR', 'NEWLINE', 'INDENT', 'DEDENT']
 def getConcreteToken(trgtAbs):
@@ -25,8 +25,7 @@ def getConcreteToken(trgtAbs):
 
         if ind < len(Python3Parser.literalNames): # len(literalNames) = 96, len(symbolicNames) = 99
             spell = Python3Parser.literalNames[ind][1:-1] # Remove leading and trailing inverted quotes
-            if spell in DataStructs.KEYWORDS:
-                return "KEYWORD"
+            
             if spell == "INVALID":
                 if trgtAbs == "NEWLINE":
                     return 'NEWLINE'
@@ -66,6 +65,15 @@ def getFeedbackFromRepairClass(repair_class):
     hasLiteral = False
     hasName = False
     otherSpecial = False
+    fullText = ""
+    msg1 = ""
+    msg2 = ""
+    actionMsg = ""
+    action = ""
+    tokens = []
+    tokensText = []
+    misc = ""
+
     for token in add:
         conc_token = getConcreteToken(token)
         if conc_token == "LITERAL":
@@ -76,6 +84,8 @@ def getFeedbackFromRepairClass(repair_class):
             otherSpecial = True
         else:
             tok_add += token + " (\'" + conc_token + "\'), "
+            tokens.append(conc_token)
+            tokensText.append(token)
     tok_add = tok_add[:-2]
 
     for token in dl:
@@ -88,39 +98,62 @@ def getFeedbackFromRepairClass(repair_class):
             otherSpecial = True
         else:
             tok_dl += token + " (\'" + conc_token + "\'), "
+            tokens.append(conc_token)
+            tokensText.append(token)
     tok_dl = tok_dl[:-2]
 
     repair_type = getRepairClassType(repair_class)
 
-    feedback = "Seems like there was some error on this line. "
+    fullText = "Seems like there was some error on this line. "
+    msg1 = "Seems like there was some error on this line. "
     if repair_type == "insert":
         if len(tok_add) > 0:
-            feedback += "You seem to be missing some token(s). "
-            feedback += "Try adding - " + tok_add + "."
+            msg2 = "You seem to be missing some token(s). "
+            actionMsg = "Try adding"
+            action = "Insert"
+            fullText += msg2
+            fullText += " " + actionMsg + " - " + tok_add + "."
     if repair_type == "delete":
         if len(tok_dl) > 0:
-            feedback += "Your use of the some token(s) may be causing problems. Try removing these "
-            feedback += "-" + tok_dl + "."
+            msg2 = "Your use of the some token(s) may be causing problems."
+            actionMsg = "Try removing these"
+            action = "Delete"
+            fullText += msg2 + " " + actionMsg
+            fullText += " -" + tok_dl + "."
     if repair_type == "replace":
         if len(tok_add) != 0 or len(tok_dl) != 0:
-            feedback += "Your use of the some token(s) may be causing problems. "
+            msg2 = "Your use of the some token(s) may be causing problems."
+            fullText += msg2 + " "
         if len(tok_dl) > 0:
-            feedback += "Try replacing these " + "-" + tok_dl + " - with something else."
+            actionMsg = "Try replacing these"
+            action = "Replace"
+            fullText += actionMsg + "-" + tok_dl + " - with something else."
 
     if repair_type == "rest":
-        feedback += "It seems there are multiple issues with line. "
+        msg2 = "It seems there are multiple issues with line. "
+        fullText += msg2
+        actionMsg = ""
         if len(tok_dl) > 0:
-            feedback += "Try deleting these token(s) - " + tok_dl + "."
+            actionMsg += "Try deleting these"
+            action = "Delete"
+            fullText += actionMsg + " - " + tok_dl + "."
         if len(tok_add) > 0:
-            feedback += " You may try to add some of these token(s) - " + tok_add + "."
+            if actionMsg == "":
+                actionMsg = "Try adding these"
+                action = "Insert"
+            else:
+                actionMsg += " then try adding these"
+                action = "Insert/Delete"
+            fullText += " You may try to add some of these token(s) - " + tok_add + "."
 
     if hasLiteral:
-        feedback += "There seems to be some issue with literals (Literals are used to represent " \
+        misc = "There seems to be some issue with literals (Literals are used to represent " \
                     "fixed values like 0, True, False, 'string' etc). Did you forget a quote (\")?"
+        fullText += misc
 
     # if hasName:
     #     feedback += "Seems like there is some issue with variable "
-
+    feedback = Feedback(fullText, msg1, msg2, actionMsg, action, tokens, tokensText, misc)
     return feedback, hasName
 
 

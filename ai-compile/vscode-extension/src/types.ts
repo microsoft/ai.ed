@@ -3,11 +3,22 @@ export interface Payload {
   lastEditLine: number;
 }
 
+export interface Feedback {
+  fullText: string;
+  msg1: string;
+  msg2: string;
+  misc: string;
+  actionMsg: string;
+  actoin: string;
+  tokens: string[];
+  tokensText: string[];
+}
+
 export interface Response {
   lineNo: number;
   repairLine: string;
-  feedbacks: string;
-  repairClasses: string;
+  feedback: Feedback[];
+  repairClasses: string[];
 }
 
 export interface DocumentStore {
