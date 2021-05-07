@@ -9,7 +9,7 @@ export interface Feedback {
   msg2: string;
   misc: string;
   actionMsg: string;
-  actoin: string;
+  action: string;
   tokens: string[];
   tokensText: string[];
 }
