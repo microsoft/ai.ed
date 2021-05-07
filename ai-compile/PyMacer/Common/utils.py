@@ -132,3 +132,15 @@ def convertEditDiffToDict(editDiff):
     rdict['end'] = editDiff.end
     rdict['insertString'] = editDiff.tokenStr
     return rdict
+
+def convertFeedbacktoDict(feedback):
+    rdict = dict()
+    rdict['fullText'] = feedback.fullText
+    rdict['msg1'] = feedback.msg1
+    rdict['msg2'] = feedback.msg2
+    rdict['actionMsg'] = feedback.actionMsg
+    rdict['action'] = feedback.action
+    rdict['tokens'] = feedback.tokens
+    rdict['tokensText'] = feedback.tokensText
+    rdict['misc'] = feedback.misc
+    return rdict
