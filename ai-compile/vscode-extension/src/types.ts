@@ -3,11 +3,21 @@ export interface Payload {
   lastEditLine: number;
 }
 
+
+
+export interface Edit {
+  type: string;
+  start: number;
+  end: number;
+  insertString: string;
+}
+
 export interface Response {
   lineNo: number;
   repairLine: string;
   feedbacks: string;
   repairClasses: string;
+  editDiffs: Edit[];
 }
 
 export interface DocumentStore {

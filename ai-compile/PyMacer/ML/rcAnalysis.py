@@ -132,15 +132,30 @@ def getLineDiff(srcLine, trgtLine):
     sm = SequenceMatcher(None, x, y)
 
     editDiffs = []
+    if len(x) == 0 and len(y) != 0:
+        tokenStr = ""
+        for t in range(len(y)):
+            token = trgtLine[t].text
+            tokenStr += token + " "
+        tokenStr = tokenStr[:-1]
+        tmpEditDiff = EditDiff("insert", 0, 0, tokenStr)
+        editDiffs.append(tmpEditDiff)
+        return editDiffs
+
+    if len(y) == 0 and len(x) != 0:
+        end = srcLine[len(x) - 1].column + len(srcLine[len(x) - 1].text) - 1
+        tmpEditDiff = EditDiff("delete", 0, end)
+        editDiffs.append(tmpEditDiff)
+        return editDiffs
     # SequenceMatcher.get_opcodes() -  https://docs.python.org/3/library/difflib.html#difflib.SequenceMatcher.get_opcodes
     for opcodes in sm.get_opcodes():
         if opcodes[0] == 'equal':
             continue
         elif opcodes[0] == 'replace':
             start = srcLine[opcodes[1]].column
-            end = srcLine[opcodes[2]-1].column + len(srcLine[opcodes[2]-1].text) - 1
+            end = srcLine[opcodes[2] - 1].column + len(srcLine[opcodes[2] - 1].text) - 1
             tokenStr = ""
-            for t in range(opcodes[3],opcodes[4]):
+            for t in range(opcodes[3], opcodes[4]):
                 token = trgtLine[t].text
                 tokenStr += token + " "
             tokenStr = tokenStr[:-1]
@@ -160,11 +175,11 @@ def getLineDiff(srcLine, trgtLine):
                 token = trgtLine[t].text
                 tokenStr += token + " "
             tokenStr = tokenStr[:-1]
-            tmpEditDiff = EditDiff("replace", start, end, tokenStr)
+            tmpEditDiff = EditDiff("insert", start, end, tokenStr)
             editDiffs.append(tmpEditDiff)
         elif opcodes[0] == 'delete':
             start = srcLine[opcodes[1]].column
-            end = srcLine[opcodes[2]].column + len(srcLine[opcodes[2] - 1].text) - 1
+            end = srcLine[opcodes[2] - 1].column + len(srcLine[opcodes[2] - 1].text) - 1
             tmpEditDiff = EditDiff("delete", start, end)
             editDiffs.append(tmpEditDiff)
 

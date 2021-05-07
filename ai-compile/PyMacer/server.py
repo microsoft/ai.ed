@@ -30,7 +30,7 @@ def getFixes():
         tmp_dict["repairLine"] = predLines[i]
         tmp_dict["repairClasses"] = repair_classes[i]
         tmp_dict["feedback"] = feedbacks[i]
-        # tmp_dict['editDiffs'] = editDiffs[i]
+        tmp_dict['editDiffs'] = editDiffs[i]
         lineRepairs.append(tmp_dict)
     return_dict["repairs"] = lineRepairs
     return_value = json.dumps(return_dict)
