@@ -15,7 +15,7 @@ export interface Edit {
 export interface Response {
   lineNo: number;
   repairLine: string;
-  feedbacks: string;
+  feedback: string;
   repairClasses: string;
   editDiffs: Edit[];
 }

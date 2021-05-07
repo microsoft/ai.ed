@@ -67,8 +67,10 @@ class AbstractConverter:
                         # TODO: Invalid Indentation
                         noOfIndents = 1
                     indentText = DataStructs.INDENT_SYMBOL * DataStructs.INDENT_SIZE
+                    column = 0
                     for i in range(noOfIndents):
-                        myToken = TokenAntlr(token.type, token.line, token.column, indentText, symb_name)
+                        myToken = TokenAntlr(token.type, token.line, column, indentText, symb_name)
+                        column += len(indentText)
                         tmp_list.append(myToken)
                 elif token.type == Python3Parser.DEDENT:
                     # No need to include Dedents in abstraction

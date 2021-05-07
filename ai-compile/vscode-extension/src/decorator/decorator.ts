@@ -135,7 +135,7 @@ export class Decorator {
         let diagnosticMsg: string = "";
         switch (diagnosticLevel) {
           case 1: {
-            diagnosticMsg = fix.feedbacks;
+            diagnosticMsg = fix.feedback;
             break;
           }
           case 2: {
@@ -145,7 +145,7 @@ export class Decorator {
           case 3: {
             // TODO: Token insertion/ deletion position
             // range = ;
-            diagnosticMsg = fix.feedbacks;
+            diagnosticMsg = fix.feedback;
             break;
           }
           case 4: {
