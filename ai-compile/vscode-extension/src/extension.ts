@@ -159,16 +159,26 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(
       "python-hints.toggleHighlight",
       async function () {
-        const flag = vscode.workspace
+        let flag : number = vscode.workspace
           .getConfiguration("python-hints")
-          .get("activeHighlight", false);
+          .get("activeHighlight", 0);
+        flag = (flag + 1) % 3;
         vscode.workspace
           .getConfiguration("python-hints")
-          .update("activeHighlight", !flag, true);
+          .update("activeHighlight", flag, true);
+        
+        let diagnosticLevel = 1;
+        if(flag == 2){
+          diagnosticLevel = 3;
+        }
+        vscode.workspace
+          .getConfiguration("python-hints")
+          .update("diagnosticLevel", diagnosticLevel, true);
+        
         // Accomodate delay in propagating above configuration
         setTimeout(() => {
           decorator.updateDecorations();
-        }, 500);
+        }, 300);
         // decorator.updateDecorations();
       }
     )

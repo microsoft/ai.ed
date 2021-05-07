@@ -118,11 +118,11 @@ export class Decorator {
     .getConfiguration("python-hints")
     .get("diagnosticLevel", 0);
 
-    const decoratorFlag: boolean = vscode.workspace
+    const decoratorFlag: number = vscode.workspace
       .getConfiguration("python-hints")
-      .get("activeHighlight", false);
+      .get("activeHighlight", 0);
     // console.log( "Updating decorations: " + flag );
-    if (decoratorFlag) {
+    if (decoratorFlag > 0) {
       
       const fixes: t.Fix = storageManager.getValue<t.DocumentStore>(filePath)
         ?.fixes;
@@ -179,8 +179,12 @@ export class Decorator {
 
     if(diagnosticLevel < 3){
       activeEditor.setDecorations(this.decorationType, highlights);
+      activeEditor.setDecorations(this.insertDecorationType, []);
+      activeEditor.setDecorations(this.deleteDecorationType, []);
+      activeEditor.setDecorations(this.replaceDecorationType, []);
     }
     else{
+      activeEditor.setDecorations(this.decorationType, []);
       activeEditor.setDecorations(this.insertDecorationType, insertHighlights);
       activeEditor.setDecorations(this.deleteDecorationType, deleteHighlights);
       activeEditor.setDecorations(this.replaceDecorationType, replaceHighlights);

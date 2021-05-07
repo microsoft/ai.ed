@@ -69,11 +69,11 @@
 				},
 				"python-hints.diagnosticLevel": {
 					"type": "integer",
-					"default": 3
+					"default": 1
 				},
 				"python-hints.activeHighlight": {
-					"type": "boolean",
-					"default": false
+					"type": "integer",
+					"default": 0
 				}
 			}
 		},
