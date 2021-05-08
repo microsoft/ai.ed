@@ -896,6 +896,7 @@ def repairProgram(fname, predAtK, source=''):
                     repair_class = new_encoder.inverse_transform([rc_int])[0]
                     tmp_list.append(repair_class)
                     feedback, hasName = getFeedbackFromRepairClass(repair_class)
+                    feedback = utils.convertFeedbacktoDict(feedback)
                     tmp_list_feedback.append(feedback)
 
             allEditDiffs.append([utils.convertEditDiffToDict(ed) for ed in editDiffs])

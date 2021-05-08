@@ -132,6 +132,20 @@ class EditDiff:
         self.end = end
         self.tokenStr = tokenStr
 
+class Feedback:
+
+    def __init__(self, fullText, msg1, msg2, actionMsg, action, tokens, tokensText, misc):
+        self.fullText = fullText
+        self.msg1 = msg1
+        self.msg2 = msg2
+        self.actionMsg = actionMsg
+        self.action = action
+        self.tokens = tokens
+        self.tokensText = tokensText
+        self.misc = misc
+
+    def __str__(self):
+        return self.fullText
 #
 # class Token:
 #

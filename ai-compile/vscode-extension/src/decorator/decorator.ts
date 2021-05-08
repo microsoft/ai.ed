@@ -135,22 +135,23 @@ export class Decorator {
         let diagnosticMsg: string = "";
         switch (diagnosticLevel) {
           case 1: {
-            diagnosticMsg = fix.feedback;
+
+            diagnosticMsg = fix.feedback[0].fullText;
             break;
           }
           case 2: {
-            diagnosticMsg = fix.repairClasses;
+            diagnosticMsg = fix.repairClasses[0];
             break;
           }
           case 3: {
             // TODO: Token insertion/ deletion position
             // range = ;
-            diagnosticMsg = fix.feedback;
+            diagnosticMsg = fix.feedback[0].fullText;
             break;
           }
           case 4: {
             // already available in codelens
-            diagnosticMsg = fix.repairLine;
+            diagnosticMsg = fix.repairLine[0];
           }
         }
 
