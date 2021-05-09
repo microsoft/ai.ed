@@ -824,6 +824,9 @@ def reset_timers():
 
 def repairProgram(fname, predAtK, source=''):
     if source == "":
+        if fname == "":
+            # This can be the case when a new file is created in vscode (it doesn't yet have a name)
+            return [], [], False, [], [], []
         srcText = open(fname).read()
     else:
         srcText = string_escape(source)
@@ -848,35 +851,38 @@ def repairProgram(fname, predAtK, source=''):
     # print('-' * 20 + '\nMACER\'s Repair\n' + '-' * 20 + '\n' + predText)
     compiled = Code(predText).getErrorInfo().lineNo == -1
     # print('\nCompiled Successfully? ', compiled)
-    predLines = predText.splitlines()
+    # predLines = predText.splitlines()
 
-    # srcCodeObjOld = Code(srcLinesOld)
-    # start = timer()
-    # abstractConverter = AbstractConverter.AbstractConverter(srcCodeObjOld, inferTypes=inferTypes, debug=debug, useAST=False)
-    # srcTokenizedCodeOld, srcAbsLinesOld, srcSymbTableOld = abstractConverter.getAbstractionAntlr()
-    # srcLinesOld = utils.joinLL(AbstractHelper.getPlainCodeFromTokenizedCode(srcTokenizedCodeOld)).splitlines()
-    # Globals.abstraction += timer() - start
-    #
-    # predCodeObj = Code(predText)
-    # start = timer()
-    # abstractConverter = AbstractConverter.AbstractConverter(predCodeObj, inferTypes=inferTypes, debug=debug, useAST = False)
-    # predTokenizedCode, predAbsLines, predSymbTable = abstractConverter.getAbstractionAntlr()
-    # predLines = utils.joinLL(AbstractHelper.getPlainCodeFromTokenizedCode(srcTokenizedCodeOld)).splitlines()
-    # Globals.abstraction += timer() - start
+    srcCodeObjOld = Code(srcLinesOld)
+    start = timer()
+    abstractConverter = AbstractConverter.AbstractConverter(srcCodeObjOld, inferTypes=inferTypes, debug=debug,
+                                                            useAST=False)
+    srcTokenizedCodeOld, srcAbsLinesOld, srcSymbTableOld = abstractConverter.getAbstractionAntlr()
+    srcLinesOld = utils.joinLL(AbstractHelper.getPlainCodeFromTokenizedCode(srcTokenizedCodeOld)).splitlines()
+    Globals.abstraction += timer() - start
+
+    predCodeObj = Code(predText)
+    start = timer()
+    abstractConverter = AbstractConverter.AbstractConverter(predCodeObj, inferTypes=inferTypes, debug=debug,
+                                                            useAST=False)
+    predTokenizedCode, predAbsLines, predSymbTable = abstractConverter.getAbstractionAntlr()
+    predLines = utils.joinLL(AbstractHelper.getPlainCodeFromTokenizedCode(predTokenizedCode)).splitlines()
+    Globals.abstraction += timer() - start
 
     correctedLines = []
     changeLines = []
     feedbacks = []
     allEditDiffs = []
     for j in range(min(len(srcLinesOld), len(predLines))):
-        srcLine = srcLinesOld[j]
+        # srcLine = srcLinesOld[j]
         predLine = predLines[j]
-        # srcLineTok = srcTokenizedCodeOld[j]
-        # predLineTok = predTokenizedCode[j]
-        alignDict = getAlignDict(srcLine, predLine)
-        # editDiffs = getLineDiff(srcLineTok, predLineTok)
-        if isinstance(alignDict, dict) and alignDict['editDistance'] > 0:
-        # if len(editDiffs) > 0:
+        # alignDict = getAlignDict(srcLine, predLine)
+        # if isinstance(alignDict, dict) and alignDict['editDistance'] > 0:
+
+        srcLineTok = srcTokenizedCodeOld[j]
+        predLineTok = predTokenizedCode[j]
+        editDiffs = getLineDiff(srcLineTok, predLineTok)
+        if len(editDiffs) > 0:
             correctedLines.append(j)
             changeLines.append(predLine)
             tmp_list = []
@@ -893,7 +899,7 @@ def repairProgram(fname, predAtK, source=''):
                     feedback = utils.convertFeedbacktoDict(feedback)
                     tmp_list_feedback.append(feedback)
 
-            # allEditDiffs.append([utils.convertEditDiffToDict(ed) for ed in editDiffs])
+            allEditDiffs.append([utils.convertEditDiffToDict(ed) for ed in editDiffs])
             repair_classes.append(tmp_list)
             feedbacks.append(tmp_list_feedback)
     # print("pred ======================", predText)

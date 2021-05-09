@@ -3,6 +3,15 @@ export interface Payload {
   lastEditLine: number;
 }
 
+
+
+export interface Edit {
+  type: string;
+  start: number;
+  end: number;
+  insertString: string;
+}
+
 export interface Feedback {
   fullText: string;
   msg1: string;
@@ -12,11 +21,13 @@ export interface Feedback {
   action: string;
   tokens: string[];
   tokensText: string[];
+
 }
 
 export interface Response {
   lineNo: number;
   repairLine: string;
+  editDiffs: Edit[];
   feedback: Feedback[];
   repairClasses: string[];
 }

@@ -31,7 +31,7 @@ def test_syntaxerror_request(client):
     assert "repairLine" in repairs[0]
     assert "repairClasses" in repairs[0]
     assert "feedback" in repairs[0]
-    # assert "editDist" in data[0]
+    assert "editDiffs" in repairs[0]
 
 
 def test_noerror_request(client):

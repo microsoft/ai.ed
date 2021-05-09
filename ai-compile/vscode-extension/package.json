@@ -72,8 +72,8 @@
 					"default": 1
 				},
 				"python-hints.activeHighlight": {
-					"type": "boolean",
-					"default": false
+					"type": "integer",
+					"default": 0
 				}
 			}
 		},

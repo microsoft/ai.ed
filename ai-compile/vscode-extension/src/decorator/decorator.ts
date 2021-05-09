@@ -19,6 +19,9 @@ import { storageManager } from "../extension";
 
 export class Decorator {
   private decorationType: vscode.TextEditorDecorationType;
+  private insertDecorationType: vscode.TextEditorDecorationType;
+  private deleteDecorationType: vscode.TextEditorDecorationType;
+  private replaceDecorationType: vscode.TextEditorDecorationType;
   private eventDisposables: vscode.Disposable[] = [];
   private regEx;
 
@@ -40,6 +43,61 @@ export class Decorator {
         backgroundColor: "darkblue",
       },
     });
+
+     // create a decorator type that we use to decorate insert operations
+     this.insertDecorationType = vscode.window.createTextEditorDecorationType({
+      borderWidth: "1px",
+      borderStyle: "solid",
+      overviewRulerColor: "green",
+      overviewRulerLane: vscode.OverviewRulerLane.Right,
+      light: {
+        // this color will be used in light color themes
+        borderColor: "darkgreen",
+        backgroundColor: "lightgreen",
+      },
+      dark: {
+        // this color will be used in dark color themes
+        borderColor: "lightgreen",
+        backgroundColor: "darkgreen",
+      },
+    });
+
+    // create a decorator type that we use to decorate delete operations
+    this.deleteDecorationType = vscode.window.createTextEditorDecorationType({
+      borderWidth: "1px",
+      borderStyle: "solid",
+      overviewRulerColor: "red",
+      overviewRulerLane: vscode.OverviewRulerLane.Right,
+      light: {
+        // this color will be used in light color themes
+        borderColor: "darkred",
+        backgroundColor: "lightred",
+      },
+      dark: {
+        // this color will be used in dark color themes
+        borderColor: "lightred",
+        backgroundColor: "darkred",
+      },
+    });
+
+    // create a decorator type that we use to decorate replace
+    this.replaceDecorationType = vscode.window.createTextEditorDecorationType({
+      borderWidth: "1px",
+      borderStyle: "solid",
+      overviewRulerColor: "blue",
+      overviewRulerLane: vscode.OverviewRulerLane.Right,
+      light: {
+        // this color will be used in light color themes
+        borderColor: "darkblue",
+        backgroundColor: "lightblue",
+      },
+      dark: {
+        // this color will be used in dark color themes
+        borderColor: "lightblue",
+        backgroundColor: "darkblue",
+      },
+    });
+
     this.regEx = /(.+)/g;
   }
 
@@ -52,15 +110,20 @@ export class Decorator {
     const document = activeEditor.document;
     const filePath = document.uri.fsPath;
     const highlights: vscode.DecorationOptions[] = [];
+    const insertHighlights: vscode.DecorationOptions[] = [];
+    const deleteHighlights: vscode.DecorationOptions[] = [];
+    const replaceHighlights: vscode.DecorationOptions[] = [];
+    
+    const diagnosticLevel: number = vscode.workspace
+    .getConfiguration("python-hints")
+    .get("diagnosticLevel", 0);
 
-    const decoratorFlag: boolean = vscode.workspace
+    const decoratorFlag: number = vscode.workspace
       .getConfiguration("python-hints")
-      .get("activeHighlight", false);
+      .get("activeHighlight", 0);
     // console.log( "Updating decorations: " + flag );
-    if (decoratorFlag) {
-      const diagnosticLevel: number = vscode.workspace
-        .getConfiguration("python-hints")
-        .get("diagnosticLevel", 0);
+    if (decoratorFlag > 0) {
+      
       const fixes: t.Fix = storageManager.getValue<t.DocumentStore>(filePath)
         ?.fixes;
       fixes?.forEach((fix) => {
@@ -72,6 +135,7 @@ export class Decorator {
         let diagnosticMsg: string = "";
         switch (diagnosticLevel) {
           case 1: {
+
             diagnosticMsg = fix.feedback[0].fullText;
             break;
           }
@@ -93,10 +157,39 @@ export class Decorator {
 
         const decoration = { range: range!, hoverMessage: diagnosticMsg };
         highlights.push(decoration);
+
+        fix.editDiffs?.forEach((edit) => {
+          const startPos = new vscode.Position(fix.lineNo, edit.start);
+          const endPos = new vscode.Position(fix.lineNo, edit.end+1);
+          if(edit.type == "insert"){
+            const insertDecoration = { range: new vscode.Range(startPos, endPos), hoverMessage: diagnosticMsg };
+            insertHighlights.push(insertDecoration);
+          }
+          else if (edit.type == "delete"){
+            const deleteDecoration = { range: new vscode.Range(startPos, endPos), hoverMessage: diagnosticMsg };
+            deleteHighlights.push(deleteDecoration);
+          }
+          else{
+            const replaceDecoration = { range: new vscode.Range(startPos, endPos), hoverMessage: diagnosticMsg };
+            replaceHighlights.push(replaceDecoration);  
+          }
+        })
+        
       });
     }
 
-    activeEditor.setDecorations(this.decorationType, highlights);
+    if(diagnosticLevel < 3){
+      activeEditor.setDecorations(this.decorationType, highlights);
+      activeEditor.setDecorations(this.insertDecorationType, []);
+      activeEditor.setDecorations(this.deleteDecorationType, []);
+      activeEditor.setDecorations(this.replaceDecorationType, []);
+    }
+    else{
+      activeEditor.setDecorations(this.decorationType, []);
+      activeEditor.setDecorations(this.insertDecorationType, insertHighlights);
+      activeEditor.setDecorations(this.deleteDecorationType, deleteHighlights);
+      activeEditor.setDecorations(this.replaceDecorationType, replaceHighlights);
+    }
   }
 
   // this method is called when vs code is activated
