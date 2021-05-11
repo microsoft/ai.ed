@@ -34,16 +34,30 @@ export class Document implements t.DocumentStore {
   }
 }
 
-export class LocalStorage {
-  constructor(private storage: vscode.Memento) {}
+export class DocStore {
 
+  private storage: Map<string, t.DocumentStore>;
+
+  constructor() {
+    this.storage = new Map();
+  }
+
+  public getValue(key: string): t.DocumentStore | undefined {
+    return this.storage.get(key);
+  }
+
+  public set(key: string, value: t.DocumentStore) {
+    this.storage.set(key, value);
+  }
+
+  /*
   public getValue<T>(key: string): T | undefined {
     return this.storage.get<T>(key);
   }
-
   public setValue<T>(key: string, value: T) {
     this.storage.update(key, value);
   }
+*/
 }
 
 export async function compile(filePath: string): Promise<boolean> {

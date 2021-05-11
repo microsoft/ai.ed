@@ -1,7 +1,8 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import { compile, getFix, LocalStorage } from "./util";
+import * as path from "path";
+import { compile, getFix } from "./util";
 import { CodelensProvider } from "./code-lens/codeLensProvider";
 import { Decorator } from "./decorator/decorator";
 
@@ -12,13 +13,8 @@ let disposables: vscode.Disposable[] = [];
 let eventDisposables: vscode.Disposable[] = [];
 
 // file-wise history store
-export let storageManager: LocalStorage;
+export let docStore: Map<string, t.DocumentStore>;
 
-// function getDocumentText(document: vscode.TextDocument): string {
-// 	let invalidRange = new vscode.Range(0, 0, document.lineCount /*intentionally missing the '-1' */, 0);
-// 	let fullRange = document.validateRange( invalidRange );
-// 	return document.getText( fullRange );
-// }
 
 async function compileAndGetFixHelper(): Promise<t.Fix> {
   // TODO: What if user changes tab immediately? - activeEditor changes - cancellation token?
@@ -66,11 +62,11 @@ async function compileAndGetFixHelper(): Promise<t.Fix> {
 
 async function compileAndGetFix(
   document: vscode.TextDocument,
-  storageManager: LocalStorage
+  docStore: Map<string, t.DocumentStore>
 ): Promise<t.Fix> {
   const filePath = document.uri.fsPath;
   let fixes: t.Fix = undefined;
-  let docHistory = storageManager.getValue<t.DocumentStore>(filePath);
+  let docHistory = docStore.get(filePath);
 
   // TODO: What if the document was left in an inconsistent state previously
   // * Can handle this case in the document open/ close event?
@@ -85,7 +81,7 @@ async function compileAndGetFix(
   if (compileFlag) {
     fixes = await compileAndGetFixHelper();
     docHistory.fixes = fixes;
-    storageManager.setValue<t.DocumentStore>(filePath, docHistory);
+    docStore.set(filePath, docHistory);
   } else {
     fixes = docHistory.fixes;
     if (fixes !== undefined) {
@@ -118,7 +114,8 @@ export function activate(context: vscode.ExtensionContext) {
     console.log("Extension 'python-hints' is now active!");
   }
 
-  storageManager = new LocalStorage(context.globalState);
+  // storageManager = new LocalStorage(context.globalState);
+  docStore = new Map();
   const decorator: Decorator = new Decorator();
 
   disposables.push(
@@ -146,7 +143,7 @@ export function activate(context: vscode.ExtensionContext) {
             // document.save() doesn't trigger if document isn't dirty
             const fixes = await compileAndGetFix(
               activeEditor.document,
-              storageManager
+              docStore
             );
             suggestFixes(fixes);
           }
@@ -168,7 +165,7 @@ export function activate(context: vscode.ExtensionContext) {
           .update("activeHighlight", flag, true);
         
         let diagnosticLevel = 1;
-        if(flag == 2){
+        if(flag === 2){
           diagnosticLevel = 3;
         }
         vscode.workspace
@@ -192,11 +189,11 @@ export function activate(context: vscode.ExtensionContext) {
         console.log("Document Saved...");
       }
       // TODO: Need to distinguish first time save from rest? - as it captures wrong name (Untitled*) - how to then check the file after saving? - another event?
-      // filename.split('.').pop() === 'py' - Check Python documents only
-      if (saveEvent.reason === vscode.TextDocumentSaveReason.Manual) {
+      if ((saveEvent.reason === vscode.TextDocumentSaveReason.Manual )
+        && (path.basename(saveEvent.document.uri.fsPath.split('.')[1])) === "py") {
         const fixes = await compileAndGetFix(
           saveEvent.document,
-          storageManager
+          docStore
         );
         suggestFixes(fixes);
         decorator.updateDecorations();
