@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import * as t from "../types";
-import { storageManager } from "../extension";
+import { docStore } from "../extension";
 
 export class CodelensProvider implements vscode.CodeLensProvider {
   private codeLenses: vscode.CodeLens[] = [];
@@ -28,7 +28,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     ) {
       this.codeLenses = [];
       const filePath = document.uri.fsPath;
-      const fixes: t.Fix = storageManager.getValue<t.DocumentStore>(filePath)
+      const fixes: t.Fix = docStore.get(filePath)
         ?.fixes;
       fixes?.forEach((fix) => {
         const position = new vscode.Position(fix.lineNo, 0);

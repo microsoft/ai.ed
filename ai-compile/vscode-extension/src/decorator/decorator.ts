@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import * as t from "../types";
-import { storageManager } from "../extension";
+import { docStore } from "../extension";
 
 // export class FileDecorationProvider implements vscode.FileDecorationProvider {
 
@@ -124,7 +124,7 @@ export class Decorator {
     // console.log( "Updating decorations: " + flag );
     if (decoratorFlag > 0) {
       
-      const fixes: t.Fix = storageManager.getValue<t.DocumentStore>(filePath)
+      const fixes: t.Fix = docStore.get(filePath)
         ?.fixes;
       fixes?.forEach((fix) => {
         const position = new vscode.Position(fix.lineNo, 0);
@@ -144,8 +144,6 @@ export class Decorator {
             break;
           }
           case 3: {
-            // TODO: Token insertion/ deletion position
-            // range = ;
             diagnosticMsg = fix.feedback[0].fullText;
             break;
           }
@@ -161,11 +159,11 @@ export class Decorator {
         fix.editDiffs?.forEach((edit) => {
           const startPos = new vscode.Position(fix.lineNo, edit.start);
           const endPos = new vscode.Position(fix.lineNo, edit.end+1);
-          if(edit.type == "insert"){
+          if(edit.type === "insert"){
             const insertDecoration = { range: new vscode.Range(startPos, endPos), hoverMessage: diagnosticMsg };
             insertHighlights.push(insertDecoration);
           }
-          else if (edit.type == "delete"){
+          else if (edit.type === "delete"){
             const deleteDecoration = { range: new vscode.Range(startPos, endPos), hoverMessage: diagnosticMsg };
             deleteHighlights.push(deleteDecoration);
           }
@@ -173,7 +171,7 @@ export class Decorator {
             const replaceDecoration = { range: new vscode.Range(startPos, endPos), hoverMessage: diagnosticMsg };
             replaceHighlights.push(replaceDecoration);  
           }
-        })
+        });
         
       });
     }
