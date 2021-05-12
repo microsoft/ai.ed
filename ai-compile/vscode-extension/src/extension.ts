@@ -21,18 +21,18 @@ export function activate(context: vscode.ExtensionContext) {
   docStore = new Map();
   const decorator: Decorator = new Decorator();
 
-  let eduActionProvider = new EduCodeActionProvider();
+  let eduCodeActionProvider = new EduCodeActionProvider();
 
   let codeActionProvider = vscode.languages.registerCodeActionsProvider(
     "python",
-    eduActionProvider,
+    eduCodeActionProvider,
     { providedCodeActionKinds: EduCodeActionProvider.providedCodeActionKinds }
   );
 
   // TODO: This isn't the correct place to call eduActionProvider, but demonstrates
   // the update call.
   if (vscode.window.activeTextEditor) {
-    eduActionProvider.update(vscode.window.activeTextEditor.document, []);
+    eduCodeActionProvider.update(vscode.window.activeTextEditor.document, []);
   }
 
   disposables.push(codeActionProvider);
