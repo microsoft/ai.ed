@@ -94,20 +94,6 @@ async function compileAndGetFix(
   return fixes;
 }
 
-// TODO: Display respective corrections at respective lines when cursor comes on that line (?)
-// * When a line is modified, then it needs re-compilation (as old fix at the line might have become stale)
-function suggestFixes(fixes: t.Fix): void {
-  if (fixes === undefined) {
-    if (c.DEBUG) {
-      console.log("Nothing to show");
-    }
-  } else {
-    if (c.DEBUG) {
-      console.log(fixes);
-    }
-  }
-}
-
 export function activate(context: vscode.ExtensionContext) {
   // console.log( storageManager.getValue("nonExistentKey") );
   if (c.DEBUG) {
@@ -145,7 +131,8 @@ export function activate(context: vscode.ExtensionContext) {
               activeEditor.document,
               docStore
             );
-            suggestFixes(fixes);
+            
+            console.log(fixes);
           }
         }
       }
@@ -195,7 +182,8 @@ export function activate(context: vscode.ExtensionContext) {
           saveEvent.document,
           docStore
         );
-        suggestFixes(fixes);
+        
+        console.log(fixes);
         decorator.updateDecorations();
       }
     })
