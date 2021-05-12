@@ -199,10 +199,13 @@ def getLineDiff(srcLine, trgtLine):
             if opcodes[1] == len(srcLine):
                 index = index - 1
                 start = srcLine[index].column + len(srcLine[index].text) - 1
+                end = start
             else:
                 start = srcLine[index].column
+                end = srcLine[index].column + len(srcLine[index].text) - 1
 
-            end = start
+            # end = start
+
             tokenStr = ""
             for t in range(opcodes[3], opcodes[4]):
                 token = trgtLine[t].text
