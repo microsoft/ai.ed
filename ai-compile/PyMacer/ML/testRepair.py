@@ -866,7 +866,7 @@ def repairProgram(fname, predAtK, source=''):
     abstractConverter = AbstractConverter.AbstractConverter(predCodeObj, inferTypes=inferTypes, debug=debug,
                                                             useAST=False)
     predTokenizedCode, predAbsLines, predSymbTable = abstractConverter.getAbstractionAntlr()
-    predLines = utils.joinLL(AbstractHelper.getPlainCodeFromTokenizedCode(predTokenizedCode)).splitlines()
+    predLines = utils.joinLL(AbstractHelper.getPlainCodeFromTokenizedCode(predTokenizedCode), useConc=True).splitlines()
     Globals.abstraction += timer() - start
 
     correctedLines = []
@@ -890,8 +890,17 @@ def repairProgram(fname, predAtK, source=''):
             for rc_int in repair_class_dict.get(j+1, []):
                 if rc_int == -1:
                     tmp_list.append("Indent fix")
-                    tmp_list_feedback.append("Are you using correct Indentation? Indentation in Python refers to the"
-                                             " (spaces and tabs) that are used at the beginning of a line.")
+                    msg1 = "Seems like something is wrong with Indentation."
+                    msg2 = "Indentation in Python refers to the " \
+                           "(spaces and tabs) that are used at the beginning of a line."
+                    action = "insert"
+                    actionMsg = "Try adding"
+                    tokens = ["    "]
+                    tokensText = ["INDENT"]
+                    fullText = msg1 + " " + msg2
+                    feedback = utils.convertFeedbacktoDict(Feedback(fullText, msg1, msg2, actionMsg, action,
+                                                                    tokens, tokensText, ""))
+                    tmp_list_feedback.append(feedback)
                 else:
                     repair_class = new_encoder.inverse_transform([rc_int])[0]
                     tmp_list.append(repair_class)
