@@ -12,7 +12,7 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
     "pythonedu"
   );
 
-  public codeActions: vscode.CodeAction[] = [];
+  public codeActions: Map<vscode.Diagnostic, vscode.CodeAction> = new Map();
   public createCodeActions: boolean = true;
 
   public update(document: vscode.TextDocument, fixes: pymacer.Fixes) {
@@ -39,7 +39,7 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
 
       if (this.createCodeActions) {
         let codeAction = this.createFix(document, diagnostics[0], undefined);
-        this.codeActions = [codeAction];
+        this.codeActions.set(diagnostics[0], codeAction);
       }
     } else {
       this.diagnosticCollection.clear();
@@ -69,12 +69,20 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
     return action;
   }
 
-  provideCodeActions(
+  public provideCodeActions(
     document: vscode.TextDocument,
     range: vscode.Range | vscode.Selection,
     context: vscode.CodeActionContext,
     token: vscode.CancellationToken
   ): vscode.CodeAction[] {
-    return this.codeActions;
+    let codeActions = [];
+    for (let diagnostic of context.diagnostics) {
+      let codeAction = this.codeActions.get(diagnostic);
+      if (codeAction) {
+        codeActions.push(codeAction);
+      }
+    }
+
+    return codeActions;
   }
 }
