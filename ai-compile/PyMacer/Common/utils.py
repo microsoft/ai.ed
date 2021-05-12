@@ -31,8 +31,11 @@ def joinList(li, joinStr='\n', func=str):
     return joinStr.join([func(i) for i in li])
 
 
-def joinLL(lists, joinStrWord=' ', joinStrLine='\n', func=str):
-    listStrs = [joinList(li, joinStrWord, func) for li in lists]
+def joinLL(lists, joinStrWord=' ', joinStrLine='\n', func=str, useConc=False):
+    if useConc:
+        listStrs = [joinConcrete(li, joinStrWord, func) for li in lists]
+    else:
+        listStrs = [joinList(li, joinStrWord, func) for li in lists]
     return joinList(listStrs, joinStrLine, func)
 
 def joinConcrete(li, joinStr=' ', func=str):
