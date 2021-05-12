@@ -65,6 +65,9 @@ export function activate(context: vscode.ExtensionContext) {
             );
 
             console.log(fixes);
+            if (vscode.window.activeTextEditor) {
+              eduCodeActionProvider.update(vscode.window.activeTextEditor.document, fixes);
+            }
           }
         }
       }
@@ -95,10 +98,6 @@ export function activate(context: vscode.ExtensionContext) {
         setTimeout(() => {
           decorator.updateDecorations();
         }, 300);
-
-        if (vscode.window.activeTextEditor) {
-          eduCodeActionProvider.update(vscode.window.activeTextEditor.document, []);
-        }
         // decorator.updateDecorations();
       }
     )
@@ -112,8 +111,8 @@ export function activate(context: vscode.ExtensionContext) {
 
       // TODO: Need to distinguish first time save from rest? - as it captures wrong name (Untitled*) - how to then check the file after saving? - another event?
       if (
-        saveEvent.reason === vscode.TextDocumentSaveReason.Manual &&
-        path.basename(saveEvent.document.uri.fsPath.split(".")[1]) === "py"
+        saveEvent.reason === vscode.TextDocumentSaveReason.Manual 
+        && path.basename(saveEvent.document.uri.fsPath).split(".")[1] === "py"
       ) {
         const fixes = await pymacer.compileAndGetFix(
           saveEvent.document,
@@ -123,7 +122,7 @@ export function activate(context: vscode.ExtensionContext) {
         console.log(fixes);
         decorator.updateDecorations();
         if (vscode.window.activeTextEditor) {
-          eduCodeActionProvider.update(vscode.window.activeTextEditor.document, []);
+          eduCodeActionProvider.update(vscode.window.activeTextEditor.document, fixes);
         }
       }
     })
