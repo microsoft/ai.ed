@@ -6,6 +6,7 @@ import * as path from "path";
 import { CodelensProvider } from "./codeLensProvider";
 import { Decorator } from "./decorator";
 
+import { EduCodeActionProvider } from "./codeActionProvider";
 import * as pymacer from "./pymacer";
 
 let disposables: vscode.Disposable[] = [];
@@ -19,6 +20,22 @@ export function activate(context: vscode.ExtensionContext) {
 
   docStore = new Map();
   const decorator: Decorator = new Decorator();
+
+  let eduActionProvider = new EduCodeActionProvider();
+
+  let codeActionProvider = vscode.languages.registerCodeActionsProvider(
+    "python",
+    eduActionProvider,
+    { providedCodeActionKinds: EduCodeActionProvider.providedCodeActionKinds }
+  );
+
+  // TODO: This isn't the correct place to call eduActionProvider, but demonstrates
+  // the update call.
+  if (vscode.window.activeTextEditor) {
+    eduActionProvider.update(vscode.window.activeTextEditor.document, []);
+  }
+
+  disposables.push(codeActionProvider);
 
   disposables.push(
     vscode.commands.registerCommand(

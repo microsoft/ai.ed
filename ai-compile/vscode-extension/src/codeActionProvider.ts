@@ -3,47 +3,68 @@ import * as path from "path";
 
 import * as pymacer from "./pymacer";
 
-export let diagnosticCollection = vscode.languages.createDiagnosticCollection(
-  "pythonedu"
-);
-
-export function updateDiagnostics(
-  document: vscode.TextDocument,
-  fixes: pymacer.Fixes
-) {
-  if (document && path.basename(document.uri.fsPath) === "rainfall.py") {
-    diagnosticCollection.set(document.uri, [
-      {
-        code: "PYEDU_MACER",
-        message:
-          "🤗 Python couldn't understand your program.\n\n" +
-          "PUT ERROR MESSAGE HERE",
-        range: new vscode.Range(
-          new vscode.Position(6, 12),
-          new vscode.Position(6, 27)
-        ),
-        severity: vscode.DiagnosticSeverity.Warning,
-        source: "PyEdu 🐍",
-      },
-    ]);
-  } else {
-    diagnosticCollection.clear();
-  }
-}
-
 export class EduCodeActionProvider implements vscode.CodeActionProvider {
   public static readonly providedCodeActionKinds = [
     vscode.CodeActionKind.QuickFix,
   ];
 
-  private createFix(diagnostic: vscode.Diagnostic): vscode.CodeAction {
+  public diagnosticCollection = vscode.languages.createDiagnosticCollection(
+    "pythonedu"
+  );
+
+  public codeActions: vscode.CodeAction[] = [];
+  public createCodeActions: boolean = true;
+
+  public update(document: vscode.TextDocument, fixes: pymacer.Fixes) {
+    if (document && path.basename(document.uri.fsPath) === "rainfall.py") {
+      // TODO: You will need to populate an array of diagnostics. For each
+      // diagnostic, you will also need to call createFix() and use it's
+      // return value to populate this.codeActions.
+      const diagnostics = [
+        {
+          code: "",
+          message:
+            "😞 Python couldn't understand your program.\n\n" +
+            "Should this be something other than 'else'?",
+          range: new vscode.Range(
+            new vscode.Position(11, 4),
+            new vscode.Position(11, 8)
+          ),
+          severity: vscode.DiagnosticSeverity.Warning,
+          source: "PyEdu 🐍",
+        },
+      ];
+
+      this.diagnosticCollection.set(document.uri, diagnostics);
+
+      if (this.createCodeActions) {
+        let codeAction = this.createFix(document, diagnostics[0], undefined);
+        this.codeActions = [codeAction];
+      }
+    } else {
+      this.diagnosticCollection.clear();
+    }
+  }
+
+  // TODO: You need to fill this in with a repair.
+  private createFix(
+    document: vscode.TextDocument,
+    diagnostic: vscode.Diagnostic,
+    fix: pymacer.Response | undefined
+  ): vscode.CodeAction {
     const action = new vscode.CodeAction(
-      "Replace x with y",
+      "Replace 'else' with 'elif'",
       vscode.CodeActionKind.QuickFix
     );
 
     action.diagnostics = [diagnostic];
     action.isPreferred = true;
+
+    action.edit = new vscode.WorkspaceEdit();
+
+    // TODO: Now use action.edit.replace, action.edit.set, etc. to make your quick fix.
+    // action.edit.
+    // action.edit.replace(document.uri, new vscode.Range(range.start, range.start.translate(0, 2)), "REPLACEMENT");
 
     return action;
   }
@@ -54,12 +75,6 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
     context: vscode.CodeActionContext,
     token: vscode.CancellationToken
   ): vscode.CodeAction[] {
-    for (let x of context.diagnostics) {
-      console.log(x);
-    }
-
-    return context.diagnostics
-      .filter((diagnostic) => diagnostic.code === "PYEDU_MACER")
-      .map((diagnostic) => this.createFix(diagnostic));
+    return this.codeActions;
   }
 }
