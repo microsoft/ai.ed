@@ -109,10 +109,12 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onWillSaveTextDocument(async (saveEvent) => {
       console.log("Document Saved...");
 
+      const filePathParts = path.basename(saveEvent.document.uri.fsPath).split(".");
+      const fileExt = filePathParts[filePathParts.length-1];
       // TODO: Need to distinguish first time save from rest? - as it captures wrong name (Untitled*) - how to then check the file after saving? - another event?
       if (
-        saveEvent.reason === vscode.TextDocumentSaveReason.Manual 
-        && path.basename(saveEvent.document.uri.fsPath).split(".")[1] === "py"
+        saveEvent.reason === vscode.TextDocumentSaveReason.Manual &&
+        fileExt === "py"
       ) {
         const fixes = await pymacer.compileAndGetFix(
           saveEvent.document,
@@ -125,7 +127,7 @@ export function activate(context: vscode.ExtensionContext) {
           eduCodeActionProvider.update(vscode.window.activeTextEditor.document, fixes);
         }
       }
-    })
+  })
   );
 
   disposables.push(
