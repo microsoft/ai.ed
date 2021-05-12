@@ -35,7 +35,6 @@ export class Document implements t.DocumentStore {
 }
 
 export class DocStore {
-
   private storage: Map<string, t.DocumentStore>;
 
   constructor() {
@@ -101,9 +100,7 @@ export async function getFix(baseURL: string, data: t.Payload): Promise<t.Fix> {
     // console.log("response", response.data.repairs);
     return response.data.repairs as t.Fix;
   } catch (error) {
-    if (c.DEBUG) {
-      console.error(error);
-    }
+    console.error(error);
 
     return undefined;
   }

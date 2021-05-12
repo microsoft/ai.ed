@@ -15,7 +15,6 @@ let eventDisposables: vscode.Disposable[] = [];
 // file-wise history store
 export let docStore: Map<string, t.DocumentStore>;
 
-
 async function compileAndGetFixHelper(): Promise<t.Fix> {
   // TODO: What if user changes tab immediately? - activeEditor changes - cancellation token?
   //* Or find an alternate way to get fullText of document and simply pass document along
@@ -27,15 +26,12 @@ async function compileAndGetFixHelper(): Promise<t.Fix> {
     const filePath = document.uri.fsPath;
     let result: t.Fix = undefined;
 
-    if (c.DEBUG) {
-      console.log(`Compiling ${filePath}`);
-    }
+    console.log(`Compiling ${filePath}`);
     const compiled = await compile(filePath);
 
     if (!compiled) {
-      if (c.DEBUG) {
-        console.log("Syntax Error -> Preparing and Sending data...");
-      }
+      console.log("Syntax Error -> Preparing and Sending data...");
+
       const data: t.Payload = {
         // srcCode: getDocumentText( document ),
         source: document.getText(),
@@ -49,9 +45,7 @@ async function compileAndGetFixHelper(): Promise<t.Fix> {
       } else {
         result = await getFix(c.baseURL!, payload);
         if (result !== undefined) {
-          if (c.DEBUG) {
-            console.log("Reply from Server:");
-          }
+          console.log("Reply from Server:");
         }
       }
     }
@@ -85,9 +79,7 @@ async function compileAndGetFix(
   } else {
     fixes = docHistory.fixes;
     if (fixes !== undefined) {
-      if (c.DEBUG) {
-        console.log("Saved fixes from History:");
-      }
+      console.log("Saved fixes from History:");
     }
   }
 
@@ -95,12 +87,8 @@ async function compileAndGetFix(
 }
 
 export function activate(context: vscode.ExtensionContext) {
-  // console.log( storageManager.getValue("nonExistentKey") );
-  if (c.DEBUG) {
-    console.log("Extension 'python-hints' is now active!");
-  }
+  console.log("Extension 'python-hints' is now active!");
 
-  // storageManager = new LocalStorage(context.globalState);
   docStore = new Map();
   const decorator: Decorator = new Decorator();
 
@@ -108,9 +96,8 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(
       "python-hints.toggleHints",
       async function () {
-        if (c.DEBUG) {
-          console.log("toggleFix Command triggered...");
-        }
+        console.log("toggleFix Command triggered...");
+
         const flag = vscode.workspace
           .getConfiguration("python-hints")
           .get("enableCodeLens", false);
@@ -131,7 +118,7 @@ export function activate(context: vscode.ExtensionContext) {
               activeEditor.document,
               docStore
             );
-            
+
             console.log(fixes);
           }
         }
@@ -143,22 +130,22 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(
       "python-hints.toggleHighlight",
       async function () {
-        let flag : number = vscode.workspace
+        let flag: number = vscode.workspace
           .getConfiguration("python-hints")
           .get("activeHighlight", 0);
         flag = (flag + 1) % 3;
         vscode.workspace
           .getConfiguration("python-hints")
           .update("activeHighlight", flag, true);
-        
+
         let diagnosticLevel = 1;
-        if(flag === 2){
+        if (flag === 2) {
           diagnosticLevel = 3;
         }
         vscode.workspace
           .getConfiguration("python-hints")
           .update("diagnosticLevel", diagnosticLevel, true);
-        
+
         // Accomodate delay in propagating above configuration
         setTimeout(() => {
           decorator.updateDecorations();
@@ -172,17 +159,15 @@ export function activate(context: vscode.ExtensionContext) {
 
   eventDisposables.push(
     vscode.workspace.onWillSaveTextDocument(async (saveEvent) => {
-      if (c.DEBUG) {
-        console.log("Document Saved...");
-      }
+      console.log("Document Saved...");
+
       // TODO: Need to distinguish first time save from rest? - as it captures wrong name (Untitled*) - how to then check the file after saving? - another event?
-      if ((saveEvent.reason === vscode.TextDocumentSaveReason.Manual )
-        && (path.basename(saveEvent.document.uri.fsPath.split('.')[1])) === "py") {
-        const fixes = await compileAndGetFix(
-          saveEvent.document,
-          docStore
-        );
-        
+      if (
+        saveEvent.reason === vscode.TextDocumentSaveReason.Manual &&
+        path.basename(saveEvent.document.uri.fsPath.split(".")[1]) === "py"
+      ) {
+        const fixes = await compileAndGetFix(saveEvent.document, docStore);
+
         console.log(fixes);
         decorator.updateDecorations();
       }
@@ -214,6 +199,4 @@ export function deactivate() {
 
   disposables = [];
   eventDisposables = [];
-
-  // flush extension storage
 }
