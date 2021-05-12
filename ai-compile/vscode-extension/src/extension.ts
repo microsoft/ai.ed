@@ -3,7 +3,7 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import { compile, getFix } from "./util";
-import { CodelensProvider } from "./code-lens/codeLensProvider";
+import { CodelensProvider } from "./codeLensProvider";
 import { Decorator } from "./decorator/decorator";
 
 import * as t from "./types";

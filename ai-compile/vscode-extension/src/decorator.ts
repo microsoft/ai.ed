@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import * as t from "../types";
-import { docStore } from "../extension";
+import * as t from "./types";
+import { docStore } from "./extension";
 
 // export class FileDecorationProvider implements vscode.FileDecorationProvider {
 
