@@ -31,9 +31,9 @@ export function activate(context: vscode.ExtensionContext) {
 
   // TODO: This isn't the correct place to call eduActionProvider, but demonstrates
   // the update call.
-  if (vscode.window.activeTextEditor) {
-    eduCodeActionProvider.update(vscode.window.activeTextEditor.document, []);
-  }
+  // if (vscode.window.activeTextEditor) {
+  //   eduCodeActionProvider.update(vscode.window.activeTextEditor.document, []);
+  // }
 
   disposables.push(codeActionProvider);
 
@@ -95,6 +95,10 @@ export function activate(context: vscode.ExtensionContext) {
         setTimeout(() => {
           decorator.updateDecorations();
         }, 300);
+
+        if (vscode.window.activeTextEditor) {
+          eduCodeActionProvider.update(vscode.window.activeTextEditor.document, []);
+        }
         // decorator.updateDecorations();
       }
     )
@@ -118,6 +122,9 @@ export function activate(context: vscode.ExtensionContext) {
 
         console.log(fixes);
         decorator.updateDecorations();
+        if (vscode.window.activeTextEditor) {
+          eduCodeActionProvider.update(vscode.window.activeTextEditor.document, []);
+        }
       }
     })
   );
