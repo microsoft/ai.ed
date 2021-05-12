@@ -28,7 +28,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     ) {
       this.codeLenses = [];
       const filePath = document.uri.fsPath;
-      const fixes: pymacer.Fix = docStore.get(filePath)?.fixes;
+      const fixes: pymacer.Fixes = docStore.get(filePath)?.fixes;
       fixes?.forEach((fix) => {
         const position = new vscode.Position(fix.lineNo, 0);
         const range = document.getWordRangeAtPosition(
