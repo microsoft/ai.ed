@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import * as t from "../types";
-import { docStore } from "../extension";
+import { docStore } from "./extension";
+import * as pymacer from "./pymacer";
 
 // export class FileDecorationProvider implements vscode.FileDecorationProvider {
 
@@ -44,8 +44,8 @@ export class Decorator {
       },
     });
 
-     // create a decorator type that we use to decorate insert operations
-     this.insertDecorationType = vscode.window.createTextEditorDecorationType({
+    // create a decorator type that we use to decorate insert operations
+    this.insertDecorationType = vscode.window.createTextEditorDecorationType({
       borderWidth: "1px",
       borderStyle: "solid",
       overviewRulerColor: "green",
@@ -113,19 +113,17 @@ export class Decorator {
     const insertHighlights: vscode.DecorationOptions[] = [];
     const deleteHighlights: vscode.DecorationOptions[] = [];
     const replaceHighlights: vscode.DecorationOptions[] = [];
-    
+
     const diagnosticLevel: number = vscode.workspace
-    .getConfiguration("python-hints")
-    .get("diagnosticLevel", 0);
+      .getConfiguration("python-hints")
+      .get("diagnosticLevel", 0);
 
     const decoratorFlag: number = vscode.workspace
       .getConfiguration("python-hints")
       .get("activeHighlight", 0);
     // console.log( "Updating decorations: " + flag );
     if (decoratorFlag > 0) {
-      
-      const fixes: t.Fix = docStore.get(filePath)
-        ?.fixes;
+      const fixes: pymacer.Fix = docStore.get(filePath)?.fixes;
       fixes?.forEach((fix) => {
         const position = new vscode.Position(fix.lineNo, 0);
         let range = document.getWordRangeAtPosition(
@@ -135,7 +133,6 @@ export class Decorator {
         let diagnosticMsg: string = "";
         switch (diagnosticLevel) {
           case 1: {
-
             diagnosticMsg = fix.feedback[0].fullText;
             break;
           }
@@ -158,35 +155,43 @@ export class Decorator {
 
         fix.editDiffs?.forEach((edit) => {
           const startPos = new vscode.Position(fix.lineNo, edit.start);
-          const endPos = new vscode.Position(fix.lineNo, edit.end+1);
-          if(edit.type === "insert"){
-            const insertDecoration = { range: new vscode.Range(startPos, endPos), hoverMessage: diagnosticMsg };
+          const endPos = new vscode.Position(fix.lineNo, edit.end + 1);
+          if (edit.type === "insert") {
+            const insertDecoration = {
+              range: new vscode.Range(startPos, endPos),
+              hoverMessage: diagnosticMsg,
+            };
             insertHighlights.push(insertDecoration);
-          }
-          else if (edit.type === "delete"){
-            const deleteDecoration = { range: new vscode.Range(startPos, endPos), hoverMessage: diagnosticMsg };
+          } else if (edit.type === "delete") {
+            const deleteDecoration = {
+              range: new vscode.Range(startPos, endPos),
+              hoverMessage: diagnosticMsg,
+            };
             deleteHighlights.push(deleteDecoration);
-          }
-          else{
-            const replaceDecoration = { range: new vscode.Range(startPos, endPos), hoverMessage: diagnosticMsg };
-            replaceHighlights.push(replaceDecoration);  
+          } else {
+            const replaceDecoration = {
+              range: new vscode.Range(startPos, endPos),
+              hoverMessage: diagnosticMsg,
+            };
+            replaceHighlights.push(replaceDecoration);
           }
         });
-        
       });
     }
 
-    if(diagnosticLevel < 3){
+    if (diagnosticLevel < 3) {
       activeEditor.setDecorations(this.decorationType, highlights);
       activeEditor.setDecorations(this.insertDecorationType, []);
       activeEditor.setDecorations(this.deleteDecorationType, []);
       activeEditor.setDecorations(this.replaceDecorationType, []);
-    }
-    else{
+    } else {
       activeEditor.setDecorations(this.decorationType, []);
       activeEditor.setDecorations(this.insertDecorationType, insertHighlights);
       activeEditor.setDecorations(this.deleteDecorationType, deleteHighlights);
-      activeEditor.setDecorations(this.replaceDecorationType, replaceHighlights);
+      activeEditor.setDecorations(
+        this.replaceDecorationType,
+        replaceHighlights
+      );
     }
   }
 
