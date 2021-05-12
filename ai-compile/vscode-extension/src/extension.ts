@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { compile, getFix } from "./util";
 import { CodelensProvider } from "./codeLensProvider";
-import { Decorator } from "./decorator/decorator";
+import { Decorator } from "./decorator";
 
 import * as t from "./types";
 import * as c from "./constants";
