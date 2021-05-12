@@ -189,20 +189,9 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  // document open event
-
-  // document close event
-
-  // on focus / change to - document event
-
-  /*
-   *	CodeLens
-   */
   disposables.push(
     vscode.languages.registerCodeLensProvider("python", new CodelensProvider())
   );
-
-  // disposables.push( vscode.window.registerFileDecorationProvider )
 
   disposables.push(
     vscode.commands.registerCommand("python-hints.codelensAction", () => {
