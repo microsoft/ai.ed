@@ -13,7 +13,7 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
   );
 
   public codeActions: Map<vscode.Diagnostic, vscode.CodeAction> = new Map();
-  public createDiagnostcs: boolean = true;
+  public createDiagnostics: boolean = true;
   public createCodeActions: boolean = true;
 
   public update(document: vscode.TextDocument, fixes: pymacer.Fixes) {
