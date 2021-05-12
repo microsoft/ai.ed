@@ -17,11 +17,11 @@
 	"contributes": {
 		"commands": [
 			{
-				"title": "Toggle Hints",
+				"title": "Toggle Diagnostics",
 				"command": "python-hints.toggleHints",
 				"icon": {
-					"light": "./media/bulb-black-icon.svg",
-					"dark": "./media/bulb-yellow-icon.svg"
+					"light": "./media/search.svg",
+					"dark": "./media/search.svg"
 				}
 			},
 			{
@@ -74,6 +74,10 @@
 				"python-hints.activeHighlight": {
 					"type": "integer",
 					"default": 0
+				},
+				"python-hints.enableDiagnostics": {
+					"type": "boolean",
+					"default": false
 				}
 			}
 		},

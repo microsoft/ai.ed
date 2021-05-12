@@ -41,14 +41,23 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(
       "python-hints.toggleHints",
       async function () {
-        console.log("toggleFix Command triggered...");
+        console.log("toggleHints Command triggered...");
 
+        /*
         const flag = vscode.workspace
           .getConfiguration("python-hints")
           .get("enableCodeLens", false);
         vscode.workspace
           .getConfiguration("python-hints")
           .update("enableCodeLens", !flag, true);
+          */
+
+        const flag = vscode.workspace
+          .getConfiguration("python-hints")
+          .get("enableDiagnostics", false);
+        vscode.workspace
+          .getConfiguration("python-hints")
+          .update("enableDiagnostics", !flag, true);
 
         // TODO: Decide when to trigger execution of backend
         const activeEditor = vscode.window.activeTextEditor;
@@ -65,9 +74,12 @@ export function activate(context: vscode.ExtensionContext) {
             );
 
             console.log(fixes);
-            if (vscode.window.activeTextEditor) {
-              eduCodeActionProvider.update(vscode.window.activeTextEditor.document, fixes);
-            }
+            // if (vscode.window.activeTextEditor) {
+              // TODO: What is the right amount of time to allow configuration propagation?
+              setTimeout(() => {
+                eduCodeActionProvider.update(vscode.window.activeTextEditor!.document, fixes);
+              }, 300);
+            // }
           }
         }
       }
@@ -123,13 +135,16 @@ export function activate(context: vscode.ExtensionContext) {
 
         console.log(fixes);
         decorator.updateDecorations();
-        if (vscode.window.activeTextEditor) {
-          eduCodeActionProvider.update(vscode.window.activeTextEditor.document, fixes);
-        }
+        // if (vscode.window.activeTextEditor) {
+          setTimeout(() => {
+            eduCodeActionProvider.update(vscode.window.activeTextEditor!.document, fixes);
+          }, 300);
+        // }
       }
   })
   );
 
+  /*
   disposables.push(
     vscode.languages.registerCodeLensProvider("python", new CodelensProvider())
   );
@@ -139,6 +154,7 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.window.showInformationMessage("CodeLens action");
     })
   );
+  */
 
   disposables.forEach((item) => context.subscriptions.push(item));
 

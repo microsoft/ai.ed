@@ -30,7 +30,7 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
      edit: pymacer.Edit
      ): vscode.Range | undefined {
 
-    let editRange: vscode.Range | undefined;
+    let customRange: vscode.Range | undefined;
     let startPos = new vscode.Position(fix.lineNo, edit.start);
     let endPos = new vscode.Position(fix.lineNo, edit.end + 1);
   
@@ -53,7 +53,7 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
         startPos = new vscode.Position(fix.lineNo, match!.index + edit.start);
         endPos = new vscode.Position(fix.lineNo, nonWSRegExp!.lastIndex + edit.start);
       }
-      editRange = new vscode.Range(startPos, endPos);
+      customRange = new vscode.Range(startPos, endPos);
 
     } else {
       
@@ -63,16 +63,16 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
           !(charCode > 96 && charCode < 123)); // (a-z)
         };
         if(isAlphaNum(startCharCode)) {
-          // highlight next word (instead of a single alnum character)
-          editRange = document.getWordRangeAtPosition(startPos);
+          // underline next word (instead of a single alnum character)
+          customRange = document.getWordRangeAtPosition(startPos);
         } else {
-          // highlight only single character (in case of non-alnum character)
-          editRange = new vscode.Range(startPos, endPos);
+          // underline only single character (in case of non-alnum character)
+          customRange = new vscode.Range(startPos, endPos);
         }
 
     }
 
-    return editRange;
+    return customRange;
 
     // return new vscode.Range(startPos, endPos);
   }
@@ -84,7 +84,12 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
     if(document) {
       const fileNameParts = path.basename(document.uri.fsPath).split('.');
       const fileExt = fileNameParts[fileNameParts.length-1];
-      if (fileExt === "py") {
+      if (
+        vscode.workspace
+        .getConfiguration("python-hints")
+        .get("enableDiagnostics", true) &&
+        fileExt === "py"
+      ) {
         const diagnosticLevel: number = vscode.workspace
         .getConfiguration("python-hints")
         .get("diagnosticLevel", 0);
@@ -164,6 +169,9 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
     diagnostic: vscode.Diagnostic,
     fix: pymacer.Response | undefined
   ): vscode.CodeAction {
+
+    // const codeActionMsg = 
+
     const action = new vscode.CodeAction(
       fix === undefined ? "" : fix.repairLine,
       vscode.CodeActionKind.QuickFix
