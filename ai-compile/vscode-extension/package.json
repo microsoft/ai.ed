@@ -1,124 +1,99 @@
 {
-	"name": "python-hints",
-	"displayName": "Hello World",
-	"description": "Dummy Extension",
-	"version": "0.0.1",
-	"engines": {
-		"vscode": "^1.54.0"
-	},
-	"categories": [
-		"Other"
-	],
-	"activationEvents": [
-		"onLanguage:python",
-		"onCommand:python-hints.toggleHints"
-	],
-	"main": "./out/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"title": "Toggle Hints",
-				"command": "python-hints.toggleHints",
-				"icon": {
-					"light": "./media/bulb-black-icon.svg",
-					"dark": "./media/bulb-yellow-icon.svg"
-				}
-			},
-			{
-				"title": "Toggle Highlight",
-				"command": "python-hints.toggleHighlight",
-				"icon": {
-					"light": "./media/highlighter-circle-icon.svg",
-					"dark": "./media/highlighter-circle-icon.svg"
-				}
-			},
-			{
-				"title": "Enable CodeLens",
-				"command": "python-hints.enableCodeLens",
-				"category": "CodeLens Sample"
-			},
-			{
-				"title": "Disable Codelens",
-				"command": "python-hints.disableCodeLens",
-				"category": "CodeLens Sample"
-			}
-		],
-		"keybindings": [
-			{
-				"command": "python-hints.toggleHints",
-				"key": "ctrl+f1",
-				"mac": "cmd+f1",
-				"when": "editorTextFocus"
-			},
-			{
-				"command": "python-hints.toggleHighlight",
-				"key": "ctrl+f2",
-				"mac": "cmd+f2",
-				"when": "editorTextFocus"
-			}
-		],
-		"configuration": {
-			"properties": {
-				"python-hints.enableCodeLens": {
-					"type": "boolean",
-					"default": false
-				},
-				"python-hints.webServerPath": {
-					"type": "string",
-					"default": "http://127.0.0.1:5000/getfixes"
-				},
-				"python-hints.diagnosticLevel": {
-					"type": "integer",
-					"default": 1
-				},
-				"python-hints.activeHighlight": {
-					"type": "integer",
-					"default": 0
-				}
-			}
-		},
-		"menus": {
-			"editor/title": [
-				{
-					"when": "resourceLangId == python",
-					"command": "python-hints.toggleHints",
-					"group": "navigation"
-				},
-				{
-					"when": "resourceLangId == python",
-					"command": "python-hints.toggleHighlight",
-					"group": "navigation"
-				}
-			]
-		}
-	},
-	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"pretest": "npm run compile && npm run lint",
-		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js",
-		"prettier": "prettier --check src/**/*.ts",
-		"prettier:fix": "prettier --write src/**/*.ts"
-	},
-	"devDependencies": {
-		"@types/glob": "^7.1.3",
-		"@types/mocha": "^8.0.4",
-		"@types/node": "^12.11.7",
-		"@types/vscode": "^1.54.0",
-		"@typescript-eslint/eslint-plugin": "^4.14.1",
-		"@typescript-eslint/parser": "^4.14.1",
-		"eslint": "^7.19.0",
-		"glob": "^7.1.6",
-		"mocha": "^8.2.1",
-		"prettier": "^2.2.1",
-		"typescript": "^4.2.4",
-		"vscode-test": "^1.5.0"
-	},
-	"dependencies": {
-		"axios": "^0.21.1",
-		"npm": "^7.10.0",
-		"tsc-watch": "^4.2.9"
-	}
+  "name": "python-hints",
+  "displayName": "Hello World",
+  "description": "Dummy Extension",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.54.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:python",
+    "onCommand:python-hints.toggleHints"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "title": "Enable CodeLens",
+        "command": "python-hints.enableCodeLens",
+        "category": "CodeLens Sample"
+      },
+      {
+        "title": "Disable Codelens",
+        "command": "python-hints.disableCodeLens",
+        "category": "CodeLens Sample"
+      },
+	  {
+        "command": "eduai.hintLevel",
+        "title": "Set Feedback Style",
+        "category": "PyEdu"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "python-hints.toggleHints",
+        "key": "ctrl+f1",
+        "mac": "cmd+f1",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "python-hints.toggleHighlight",
+        "key": "ctrl+f2",
+        "mac": "cmd+f2",
+        "when": "editorTextFocus"
+      }
+    ],
+    "configuration": {
+      "properties": {
+        "python-hints.enableCodeLens": {
+          "type": "boolean",
+          "default": false
+        },
+        "python-hints.webServerPath": {
+          "type": "string",
+          "default": "http://127.0.0.1:5000/getfixes"
+        },
+        "python-hints.diagnosticLevel": {
+          "type": "integer",
+          "default": 1
+        },
+        "python-hints.activeHighlight": {
+          "type": "integer",
+          "default": 0
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "prettier": "prettier --check src/**/*.ts",
+    "prettier:fix": "prettier --write src/**/*.ts"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.3",
+    "@types/mocha": "^8.0.4",
+    "@types/node": "^12.11.7",
+    "@types/vscode": "^1.54.0",
+    "@typescript-eslint/eslint-plugin": "^4.14.1",
+    "@typescript-eslint/parser": "^4.14.1",
+    "eslint": "^7.19.0",
+    "glob": "^7.1.6",
+    "mocha": "^8.2.1",
+    "prettier": "^2.2.1",
+    "typescript": "^4.2.4",
+    "vscode-test": "^1.5.0"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "npm": "^7.10.0",
+    "tsc-watch": "^4.2.9"
+  }
 }

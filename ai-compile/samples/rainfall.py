@@ -4,7 +4,7 @@ def rainfall(measurements):
 
     for day in measurements:
         if day => 0:
-            sum = sum + day
+            sum + day = sum
             count = count + 1
     
     if count > 0:
