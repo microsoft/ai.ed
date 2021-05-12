@@ -3,6 +3,11 @@ import * as path from "path";
 
 import * as pymacer from "./pymacer";
 
+export enum FeedbackLevel {
+  Novice,
+  Expert,
+}
+
 export class EduCodeActionProvider implements vscode.CodeActionProvider {
   public static readonly providedCodeActionKinds = [
     vscode.CodeActionKind.QuickFix,
@@ -15,6 +20,7 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
   public codeActions: Map<vscode.Diagnostic, vscode.CodeAction> = new Map();
   public createDiagnostics: boolean = true;
   public createCodeActions: boolean = true;
+  public feedbackLevel = FeedbackLevel.Novice;
 
   public update(document: vscode.TextDocument, fixes: pymacer.Fixes) {
     if (document && path.basename(document.uri.fsPath) === "rainfall.py") {
