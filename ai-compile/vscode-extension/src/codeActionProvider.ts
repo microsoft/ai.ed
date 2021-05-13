@@ -3,6 +3,7 @@ import * as path from "path";
 
 import * as pymacer from "./pymacer";
 import { docStore } from "./extension";
+import { mkdirSync } from "node:fs";
 
 
 export enum FeedbackLevel {
@@ -24,7 +25,7 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
   public createCodeActions: boolean = true;
   public feedbackLevel = FeedbackLevel.novice;
 
-  public getRange(
+  public getCustomRange(
      document: vscode.TextDocument, 
      fix: pymacer.Response,
      edit: pymacer.Edit
@@ -38,7 +39,7 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
     lineText = lineText.slice(edit.start);
     const startCharCode = lineText.charCodeAt(0);
     
-    // highlight next word (in case of a starting WS character - typical of indentation fixes)
+    // underline next word (in case of a starting WS character - typical of indentation fixes)
     if(startCharCode === " ".charCodeAt(0)) {
       
       const alNumRegExp = /[a-z0-9_]+/ig;
@@ -93,6 +94,7 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
         const diagnosticLevel: number = vscode.workspace
         .getConfiguration("python-hints")
         .get("diagnosticLevel", 0);
+        console.log(diagnosticLevel);
 
         let diagnostics: {
           code: string;
@@ -107,54 +109,44 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
         // .get("activeHighlight", 0);
 
         // if (diagnosticFlag > 0) {
-        if(this.feedbackLevel === FeedbackLevel.novice) {
-          const fixes: pymacer.Fixes = docStore.get(document.uri.fsPath)?.fixes;
-          fixes?.forEach((fix) => {
-            let diagnosticMsg: string = "";
-            switch (diagnosticLevel) {
-              case 1: {
-                diagnosticMsg = fix.feedback[0].fullText;
-                break;
-              }
-              case 2: {
-                diagnosticMsg = fix.repairClasses[0];
-                break;
-              }
-              case 3: {
-                diagnosticMsg = fix.feedback[0].fullText;
-                break;
-              }
-            }
-            // TODO?: Handle case of multiple errors/ edits on single line
-            fix.editDiffs?.forEach((edit) => {
-              const startPos = new vscode.Position(fix.lineNo, edit.start);
-              const endPos = new vscode.Position(fix.lineNo, edit.end + 1);
-              const editRange = this.getRange(document, fix, edit);
-              // const editRange = edit.type === "insert" ?
-              //   document.getWordRangeAtPosition(startPos):
-              //   new vscode.Range(startPos, endPos);
-              // console.log(editRange?.start);
-              // console.log(editRange?.end);
-              // let editRange: vscode.Range | undefined;
-              // if (edit.type === "insert") {
-              //   editRange = document.getWordRangeAtPosition(startPos);
-              // } else {
-              //   editRange = new vscode.Range(startPos, endPos);
-              // }
-              diagnostics.push({
-                code: "",
-                message: diagnosticMsg ?? "Error in this line",
-                range: editRange!,
-                severity: vscode.DiagnosticSeverity.Warning,
-                source: "PyEdu 🐍",
-              });
-              if (this.createCodeActions) {
-                let codeAction = this.createFix(document, diagnostics[diagnostics.length-1], fix);
-                this.codeActions.set(diagnostics[diagnostics.length-1], codeAction);
-              }
+        
+        const fixes: pymacer.Fixes = docStore.get(document.uri.fsPath)?.fixes;
+        fixes?.forEach((fix) => {
+          let diagnosticMsg: string = "";
+          if(this.feedbackLevel === FeedbackLevel.novice) {
+            diagnosticMsg = fix.feedback[0].fullText;
+          } else if(this.feedbackLevel === FeedbackLevel.expert) {
+            diagnosticMsg = fix.repairClasses[0];
+          }
+          // TODO?: Handle case of multiple errors/ edits on single line
+          fix.editDiffs?.forEach((edit) => {
+            const startPos = new vscode.Position(fix.lineNo, edit.start);
+            const endPos = new vscode.Position(fix.lineNo, edit.end + 1);
+            const editRange = this.getCustomRange(document, fix, edit);
+            // const editRange = edit.type === "insert" ?
+            //   document.getWordRangeAtPosition(startPos):
+            //   new vscode.Range(startPos, endPos);
+            // console.log(editRange?.start);
+            // console.log(editRange?.end);
+            // let editRange: vscode.Range | undefined;
+            // if (edit.type === "insert") {
+            //   editRange = document.getWordRangeAtPosition(startPos);
+            // } else {
+            //   editRange = new vscode.Range(startPos, endPos);
+            // }
+            diagnostics.push({
+              code: "",
+              message: diagnosticMsg ?? "Error in this line",
+              range: editRange!,
+              severity: vscode.DiagnosticSeverity.Warning,
+              source: "PyEdu 🐍",
             });
+            if (this.createCodeActions) {
+              let codeAction = this.createFix(document, diagnostics[diagnostics.length-1], fix);
+              this.codeActions.set(diagnostics[diagnostics.length-1], codeAction);
+            }
           });
-        }
+        });
 
         this.diagnosticCollection.set(document.uri, diagnostics);
 
@@ -170,12 +162,34 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
     fix: pymacer.Response | undefined
   ): vscode.CodeAction {
 
-    // const codeActionMsg = 
+    let codeActionMsg: string = "Apply misc. repairs";
+    // let edits: pymacer.Edit[] = [];
+    // fix?.editDiffs.forEach((edit) => edits.push(edit));
+    // const edit = edits[0];
+    if(fix !== undefined ) {
+      const edit = fix?.editDiffs[0];      
+      if(edit !== undefined) {
+        let srcText = document.lineAt(fix.lineNo).text;
+        const trgtText = edit.insertString;
+        if(edit.type === "replace") {
+          srcText = srcText.slice(edit.start, edit.end + 1);
+          codeActionMsg = "Replace '" + srcText + "' with '" + trgtText + "'";
+        } else if(edit.type === "insert") {
+            srcText = srcText.slice(diagnostic.range.start.character, diagnostic.range.end.character);
+            codeActionMsg = "Insert '" + trgtText + "' before '" + srcText + "'";
+        } else if(edit.type === "delete") {
+            srcText = srcText.slice(edit.start, edit.end + 1);
+            codeActionMsg = "Delete '" + srcText + "'";
+        }
+      }
+    }
+
 
     const action = new vscode.CodeAction(
-      fix === undefined ? "" : fix.repairLine,
+      codeActionMsg,
       vscode.CodeActionKind.QuickFix
     );
+    // fix === undefined ? "" : fix.repairLine,
 
     action.diagnostics = [diagnostic];
     action.isPreferred = true;
