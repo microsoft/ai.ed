@@ -6,6 +6,7 @@ import * as path from "path";
 import { CodelensProvider } from "./codeLensProvider";
 import { Decorator } from "./decorator";
 
+import { EduCodeActionProvider } from "./codeActionProvider";
 import * as pymacer from "./pymacer";
 
 let disposables: vscode.Disposable[] = [];
@@ -20,18 +21,43 @@ export function activate(context: vscode.ExtensionContext) {
   docStore = new Map();
   const decorator: Decorator = new Decorator();
 
+  let eduCodeActionProvider = new EduCodeActionProvider();
+
+  let codeActionProvider = vscode.languages.registerCodeActionsProvider(
+    "python",
+    eduCodeActionProvider,
+    { providedCodeActionKinds: EduCodeActionProvider.providedCodeActionKinds }
+  );
+
+  // TODO: This isn't the correct place to call eduActionProvider, but demonstrates
+  // the update call.
+  // if (vscode.window.activeTextEditor) {
+  //   eduCodeActionProvider.update(vscode.window.activeTextEditor.document, []);
+  // }
+
+  disposables.push(codeActionProvider);
+
   disposables.push(
     vscode.commands.registerCommand(
       "python-hints.toggleHints",
       async function () {
-        console.log("toggleFix Command triggered...");
+        console.log("toggleHints Command triggered...");
 
+        /*
         const flag = vscode.workspace
           .getConfiguration("python-hints")
           .get("enableCodeLens", false);
         vscode.workspace
           .getConfiguration("python-hints")
           .update("enableCodeLens", !flag, true);
+          */
+
+        const flag = vscode.workspace
+          .getConfiguration("python-hints")
+          .get("enableDiagnostics", false);
+        vscode.workspace
+          .getConfiguration("python-hints")
+          .update("enableDiagnostics", !flag, true);
 
         // TODO: Decide when to trigger execution of backend
         const activeEditor = vscode.window.activeTextEditor;
@@ -48,6 +74,12 @@ export function activate(context: vscode.ExtensionContext) {
             );
 
             console.log(fixes);
+            // if (vscode.window.activeTextEditor) {
+              // TODO: What is the right amount of time to allow configuration propagation?
+              setTimeout(() => {
+                eduCodeActionProvider.update(vscode.window.activeTextEditor!.document, fixes);
+              }, 300);
+            // }
           }
         }
       }
@@ -89,10 +121,12 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onWillSaveTextDocument(async (saveEvent) => {
       console.log("Document Saved...");
 
+      const filePathParts = path.basename(saveEvent.document.uri.fsPath).split(".");
+      const fileExt = filePathParts[filePathParts.length-1];
       // TODO: Need to distinguish first time save from rest? - as it captures wrong name (Untitled*) - how to then check the file after saving? - another event?
       if (
         saveEvent.reason === vscode.TextDocumentSaveReason.Manual &&
-        path.basename(saveEvent.document.uri.fsPath.split(".")[1]) === "py"
+        fileExt === "py"
       ) {
         const fixes = await pymacer.compileAndGetFix(
           saveEvent.document,
@@ -101,10 +135,16 @@ export function activate(context: vscode.ExtensionContext) {
 
         console.log(fixes);
         decorator.updateDecorations();
+        // if (vscode.window.activeTextEditor) {
+          setTimeout(() => {
+            eduCodeActionProvider.update(vscode.window.activeTextEditor!.document, fixes);
+          }, 300);
+        // }
       }
-    })
+  })
   );
 
+  /*
   disposables.push(
     vscode.languages.registerCodeLensProvider("python", new CodelensProvider())
   );
@@ -114,6 +154,7 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.window.showInformationMessage("CodeLens action");
     })
   );
+  */
 
   disposables.forEach((item) => context.subscriptions.push(item));
 

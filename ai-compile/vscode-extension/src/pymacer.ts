@@ -6,7 +6,6 @@ import axios from "axios";
 import * as https from "https";
 import * as fs from "fs";
 
-
 export interface Payload {
   source: string;
   lastEditLine: number;
@@ -38,13 +37,13 @@ export interface Response {
   repairClasses: string[];
 }
 
+export type Fixes = Response[] | undefined;
+
 export interface DocumentStore {
   // TODO: Can this be made private? Does it make sense?
   filePath: string;
-  fixes: Fix;
+  fixes: Fixes;
 }
-
-export type Fix = Response[] | undefined;
 
 export const baseURL: string | undefined = vscode.workspace
   .getConfiguration("python-hints")
@@ -57,9 +56,9 @@ export const DEBUG: boolean = true;
 export async function compileAndGetFix(
   document: vscode.TextDocument,
   docStore: Map<string, DocumentStore>
-): Promise<Fix> {
+): Promise<Fixes> {
   const filePath = document.uri.fsPath;
-  let fixes: Fix = undefined;
+  let fixes: Fixes = undefined;
   let docHistory = docStore.get(filePath);
 
   // TODO: What if the document was left in an inconsistent state previously
@@ -86,7 +85,7 @@ export async function compileAndGetFix(
   return fixes;
 }
 
-async function compileAndGetFixHelper(): Promise<Fix> {
+async function compileAndGetFixHelper(): Promise<Fixes> {
   // TODO: What if user changes tab immediately? - activeEditor changes - cancellation token?
   //* Or find an alternate way to get fullText of document and simply pass document along
   const activeEditor = vscode.window.activeTextEditor;
@@ -95,7 +94,7 @@ async function compileAndGetFixHelper(): Promise<Fix> {
     const document = activeEditor.document;
     const cursorPosition = activeEditor.selection.active;
     const filePath = document.uri.fsPath;
-    let result: Fix = undefined;
+    let result: Fixes = undefined;
 
     console.log(`Compiling ${filePath}`);
     const compiled = await compile(filePath);
@@ -127,9 +126,9 @@ async function compileAndGetFixHelper(): Promise<Fix> {
 
 export class Document implements DocumentStore {
   private _filePath: string;
-  private _fixes: Fix;
+  private _fixes: Fixes;
 
-  constructor(filePath: string, fixes: Fix) {
+  constructor(filePath: string, fixes: Fixes) {
     this._filePath = filePath;
     this._fixes = fixes;
   }
@@ -137,7 +136,7 @@ export class Document implements DocumentStore {
   public get fixes() {
     return this._fixes;
   }
-  public set fixes(value: Fix) {
+  public set fixes(value: Fixes) {
     this._fixes = value;
   }
 
@@ -202,7 +201,7 @@ export async function compile(filePath: string): Promise<boolean> {
   }
 }
 
-export async function getFix(baseURL: string, data: Payload): Promise<Fix> {
+export async function getFix(baseURL: string, data: Payload): Promise<Fixes> {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   const agent = new https.Agent({
     rejectUnauthorized: false,
@@ -213,7 +212,7 @@ export async function getFix(baseURL: string, data: Payload): Promise<Fix> {
       httpsAgent: agent,
     });
     // console.log("response", response.data.repairs);
-    return response.data.repairs as Fix;
+    return response.data.repairs as Fixes;
   } catch (error) {
     console.error(error);
 

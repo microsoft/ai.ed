@@ -123,7 +123,7 @@ export class Decorator {
       .get("activeHighlight", 0);
     // console.log( "Updating decorations: " + flag );
     if (decoratorFlag > 0) {
-      const fixes: pymacer.Fix = docStore.get(filePath)?.fixes;
+      const fixes: pymacer.Fixes = docStore.get(filePath)?.fixes;
       fixes?.forEach((fix) => {
         const position = new vscode.Position(fix.lineNo, 0);
         let range = document.getWordRangeAtPosition(
