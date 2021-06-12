@@ -1,7 +1,8 @@
 # AI.Ed
 
 This is the AI for (programming) EDucation project.  The goal is to provide a great set of tools to provide AI-powered
-assistance to students taking programming classes and educators teaching them.
+assistance to students taking programming classes and educators teaching them. Installation instructions are in 
+[BUILD.md](https://github.com/microsoft/ai.ed/blob/main/BUILD.md).
 
 This project is open source and freely available for educational purposes.  All of the source code in this repository is
 available under the MIT license.
