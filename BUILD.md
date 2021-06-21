@@ -15,11 +15,9 @@ Both of these components are in the `ai-compile` directory.
 
 ## PyMACER
 
-PyMACER uses the edlib package, which wraps a C++ library. This package does not have pre-built Windows binaries ([Issue #178: Binary wheels for Windows](https://github.com/Martinsos/edlib/issues/178)), so you will need to build from source during `pip install`. To prepare for this, verify that you have the "Desktop development with C++" workload selected in the Visual Studio 2019 installer.
+PyMACER uses the edlib package, which wraps a C++ library. This package does not have pre-built Windows binaries ([Issue #178: Binary wheels for Windows](https://github.com/Martinsos/edlib/issues/178)), so you will need to build from source during `pip install`. To prepare for this, verify that you have the [Desktop development with C++](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-160) workload selected in the [Visual Studio 2019 installer](https://docs.microsoft.com/en-us/visualstudio/install/modify-visual-studio?view=vs-2019).
 
-Then, perform the following commands using the `x64 Native Tools Command Prompt for VS 2019` command prompt so that Python will have access to the required C++ build tools.
-
-Create a virtual environment for Python. Here, we'll assume this environment will be located `C:\venv\pymacer`.
+Then, execute the following commands using the [x64 Native Tools Command Prompt for VS 2019](https://docs.microsoft.com/en-us/cpp/build/how-to-enable-a-64-bit-visual-cpp-toolset-on-the-command-line?view=msvc-160) so that Python will have access to the required C++ build tools. The first line will create a virtual environment for Python. Here, we will assume this environment will be located in `C:\venv\pymacer`. Change your current directory to `ai-compile\PyMacer` before executing the commands.
 
 ```
 python -m venv C:\venv\pymacer
@@ -43,7 +41,7 @@ This will display some expected warnings related to TensorFlow. The last lines s
 
 ## vscode-extension
 
-The PyMACER server should already be running before using this extension.
+The PyMACER server should already be running before using this extension. Open another [x64 Native Tools Command Prompt for VS 2019](https://docs.microsoft.com/en-us/cpp/build/how-to-enable-a-64-bit-visual-cpp-toolset-on-the-command-line?view=msvc-160) window. Then change your current directory to `vscode-extension`.
 
 Open a new terminal and change your directory to `vscode-extension`. Then execute `npm install` to install the required npm packages. Then execute the
 following command:
@@ -52,9 +50,10 @@ following command:
 code .
 ```
 
-Click the `Run and Debug` button (Ctrl+Shift+D) on the left toolbar. Then click `Run Extension` to run the extension.
+Click the `Run and Debug (Ctrl+Shift+D)` button on the left toolbar. Then click `Run Extension` from the top toolbar to initiate a separate instance of VS code with the extension enabled.
 
-After opening a Python file, you can verify that the extension has loaded in the debug console:
+Create a new python file or open an existing one. You might 
+need to install a python debugger extension.  After opening a Python file, you can verify that the `python-hint` extension has loaded in the debug console of the first instance of VS code:
 
 ```
 Extension 'python-hints' is now active!
