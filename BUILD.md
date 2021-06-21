@@ -1,6 +1,6 @@
 # Getting started
 
-The project consists of two components:
+This project consists of two components:
 
 1. **PyMACER** is a Python adaptation of [MACER: A Modular Framework for Accelerated Compilation Error Repair.](https://github.com/purushottamkar/macer).
 2. **vscode-extension** provides the front-end experience pf PyMACER in Visual Studio Code.
