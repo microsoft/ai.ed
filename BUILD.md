@@ -1,17 +1,17 @@
-# Building the Project
+# Getting started
 
-This project consists of two components:
+The project consists of two components:
 
-1. PyMACER. PyMACER is a Python adaptation of [MACER: A Modular Framework for Accelerated Compilation Error Repair.](https://github.com/purushottamkar/macer).
-2. vscode-extension. This provides the frontend experience in Visual Studio Code, and uses PyMACER.
+1. **PyMACER** is a Python adaptation of [MACER: A Modular Framework for Accelerated Compilation Error Repair.](https://github.com/purushottamkar/macer).
+2. **vscode-extension** provides the front-end experience pf PyMACER in Visual Studio Code.
 
-Both of these components are found in the `ai-compile` directory.
+Both of these components are in the `ai-compile` directory.
 
 ## Pre-requisities
 
-- Python 3.8.9 (64-bit). Python 3.9 does not work due to tensorflow requirement.
+- Python [3.8.9 (64-bit)](https://www.python.org/downloads/release/python-389/). Python 3.9 does not work due to tensorflow requirement.
 - Visual Studio 2019 with Desktop development with C++.
-- Some recent version of node and npm for building the vscode-extension.
+- [`node`](https://treehouse.github.io/installation-guides/windows/node-windows.html) version 14.17.0 and `npm` version 6.14.13 for building the vscode-extension.
 
 ## PyMACER
 
@@ -26,8 +26,9 @@ python -m venv C:\venv\pymacer
 C:\venv\pymacer\Scripts\activate
 python -m pip install -r requirements.txt
 ```
+You may see some error messages saying `ERROR: After October 2020 you may experience ...`. You can ignore that. 
 
-After installation, you should be able to start the server with:
+After installation, start the server with:
 
 ```
 python server.py
@@ -40,28 +41,18 @@ This will display some expected warnings related to TensorFlow. The last lines s
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```
 
-You can test the REST server by sending a `POST` request to `http://localhost:5000/getfixes` with your favorite client:
-
-```json
-{
-  "source": "number = str(input(\"Enter a number\"))\r\nprint(\"You chose \" number)",
-  "lastEditLine": 9
-}
-```
-
-The response should have some useful data.
-
 ## vscode-extension
 
 The PyMACER server should already be running before using this extension.
 
-Within the `vscode-extension` directory, type `npm install` to install the required npm packages. Then:
+Open a new terminal and change your directory to `vscode-extension`. Then execute `npm install` to install the required npm packages. Then execute the
+following command:
 
 ```
 code .
 ```
 
-Click the `Run and Debug` button on the left toolbar. Then click `Run Extension` to run the extension.
+Click the `Run and Debug` button (Ctrl+Shift+D) on the left toolbar. Then click `Run Extension` to run the extension.
 
 After opening a Python file, you can verify that the extension has loaded in the debug console:
 
