@@ -38,7 +38,7 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
         code: "",
         message:
           "😞 Python couldn't understand your program.\n\n" +
-          "Look more closely at '=>'. Python doesn't recognize this comparison operator.",
+          "Look closely at '=>'. Python doesn't recognize this comparison operator.",
         range: new vscode.Range(
           new vscode.Position(5, 15),
           new vscode.Position(5, 17)
@@ -74,7 +74,7 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
         code: "",
         message:
           "😞 Python couldn't understand your program.\n\n" +
-          "Look more closely at the left and right sides of assignment statement (=).",
+          "Look closely at the left and right sides of the assignment statement (=).",
         range: new vscode.Range(
           new vscode.Position(6, 12),
           new vscode.Position(6, 28)
