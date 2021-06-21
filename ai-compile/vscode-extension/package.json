@@ -1,7 +1,7 @@
 {
 	"name": "python-hints",
-	"displayName": "Hello World",
-	"description": "Dummy Extension",
+	"displayName": "python-hints",
+	"description": "python-hints Extension",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.54.0"
