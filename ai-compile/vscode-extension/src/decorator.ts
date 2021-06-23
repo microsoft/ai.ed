@@ -1,23 +1,10 @@
 import * as vscode from "vscode";
-import { docStore } from "./extension";
+
+import { documentStore } from "./extension";
 import * as pymacer from "./pymacer";
 
-// export class FileDecorationProvider implements vscode.FileDecorationProvider {
-
-//     private regex: RegExp;
-//     private _onDidChangeCodeLenses: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
-//     public readonly onDidChangeCodeLenses: vscode.Event<void> = this._onDidChangeCodeLenses.event;
-
-// 	constructor() {
-// 		this.regex = /(.+)/g;
-// 	}
-
-// 	public provideFileDecoration( uri: vscode.Uri, token: vscode.CancellationToken ): vscode.Decora {
-
-// 	}
-// }
-
 export class Decorator {
+  
   private decorationType: vscode.TextEditorDecorationType;
   private insertDecorationType: vscode.TextEditorDecorationType;
   private deleteDecorationType: vscode.TextEditorDecorationType;
@@ -26,7 +13,7 @@ export class Decorator {
   private regEx;
 
   constructor() {
-    // create a decorator type that we use to decorate small numbers
+    // create a decorator type used for generic decorations
     this.decorationType = vscode.window.createTextEditorDecorationType({
       borderWidth: "1px",
       borderStyle: "solid",
@@ -114,39 +101,31 @@ export class Decorator {
     const deleteHighlights: vscode.DecorationOptions[] = [];
     const replaceHighlights: vscode.DecorationOptions[] = [];
 
-    const diagnosticLevel: number = vscode.workspace
-      .getConfiguration("python-hints")
-      .get("diagnosticLevel", 0);
-
-    const decoratorFlag: number = vscode.workspace
+    // an indicator to choosing a particular feedback level 
+    const activeHighlight: number = vscode.workspace
       .getConfiguration("python-hints")
       .get("activeHighlight", 0);
-    // console.log( "Updating decorations: " + flag );
-    if (decoratorFlag > 0) {
-      const fixes: pymacer.Fixes = docStore.get(filePath)?.fixes;
+    
+    if (activeHighlight !== 0) {
+
+      const fixes: pymacer.Fixes = documentStore.get(filePath)?.fixes;
       fixes?.forEach((fix) => {
         const position = new vscode.Position(fix.lineNo, 0);
         let range = document.getWordRangeAtPosition(
           position,
           new RegExp(this.regEx)
         );
+
         let diagnosticMsg: string = "";
-        switch (diagnosticLevel) {
+
+        switch (activeHighlight) {
           case 1: {
             diagnosticMsg = fix.feedback[0].fullText;
             break;
           }
           case 2: {
-            diagnosticMsg = fix.repairClasses[0];
+            diagnosticMsg = fix.editDiffs[0].type.toUpperCase();
             break;
-          }
-          case 3: {
-            diagnosticMsg = fix.feedback[0].fullText;
-            break;
-          }
-          case 4: {
-            // already available in codelens
-            diagnosticMsg = fix.repairLine[0];
           }
         }
 
@@ -156,21 +135,22 @@ export class Decorator {
         fix.editDiffs?.forEach((edit) => {
           const startPos = new vscode.Position(fix.lineNo, edit.start);
           const endPos = new vscode.Position(fix.lineNo, edit.end + 1);
+          const range = new vscode.Range(startPos, endPos);
           if (edit.type === "insert") {
             const insertDecoration = {
-              range: new vscode.Range(startPos, endPos),
+              range: range,
               hoverMessage: diagnosticMsg,
             };
             insertHighlights.push(insertDecoration);
           } else if (edit.type === "delete") {
             const deleteDecoration = {
-              range: new vscode.Range(startPos, endPos),
+              range: range,
               hoverMessage: diagnosticMsg,
             };
             deleteHighlights.push(deleteDecoration);
           } else {
             const replaceDecoration = {
-              range: new vscode.Range(startPos, endPos),
+              range: range,
               hoverMessage: diagnosticMsg,
             };
             replaceHighlights.push(replaceDecoration);
@@ -179,7 +159,7 @@ export class Decorator {
       });
     }
 
-    if (diagnosticLevel < 3) {
+    if (activeHighlight < 2) {
       activeEditor.setDecorations(this.decorationType, highlights);
       activeEditor.setDecorations(this.insertDecorationType, []);
       activeEditor.setDecorations(this.deleteDecorationType, []);
@@ -195,8 +175,11 @@ export class Decorator {
     }
   }
 
-  // this method is called when vs code is activated
-  public registerDecorator(context: vscode.ExtensionContext) {
+  // this method is called in the extension activation function
+  public registerDecorator(
+    context: vscode.ExtensionContext
+  ) {
+
     this.eventDisposables.push(
       vscode.window.onDidChangeActiveTextEditor(
         (editor) => {
@@ -221,20 +204,5 @@ export class Decorator {
         context.subscriptions
       )
     );
-  }
-
-  // TODO: Maintain a state of all open editors?
-  // Check Deregister of event disposables
-  public deregisterDecorator(context: vscode.ExtensionContext) {
-    // this.registerDecorator( context, false );
-    // vscode.workspace.getConfiguration( "python-hints" ).update( "activeHighlight", false, true );
-    // 	if( this.eventDisposables ) {
-    // 		this.eventDisposables.forEach( item => item.dispose() );
-    // 	}
-    // 	const activeEditor = vscode.window.activeTextEditor;
-    // 	if( activeEditor ) {
-    // 		activeEditor.setDecorations( this.decorationType, highlights );
-    // 	}
-    // 	this.eventDisposables = [];
   }
 }

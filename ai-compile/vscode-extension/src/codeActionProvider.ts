@@ -2,13 +2,11 @@ import * as vscode from "vscode";
 import * as path from "path";
 
 import * as pymacer from "./pymacer";
-import { docStore } from "./extension";
-import { mkdirSync } from "node:fs";
-
+import { documentStore } from "./extension";
 
 export enum FeedbackLevel {
   novice,
-  expert,
+  expert
 }
 
 export class EduCodeActionProvider implements vscode.CodeActionProvider {
@@ -25,6 +23,9 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
   public createCodeActions: boolean = true;
   public feedbackLevel = FeedbackLevel.novice;
 
+  /* This function helps modify the default range for a fix returned by pymacer.
+   * The range is used, to underline with squiggly lines, for indicating errors to the user.
+  */
   public getCustomRange(
      document: vscode.TextDocument, 
      fix: pymacer.Response,
@@ -37,16 +38,17 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
   
     let lineText = document.lineAt(fix.lineNo).text;
     lineText = lineText.slice(edit.start);
-    const startCharCode = lineText.charCodeAt(0);
+    const lineStartCharCode = lineText.charCodeAt(0);
     
-    // underline next word (in case of a starting WS character - typical of indentation fixes)
-    if(startCharCode === " ".charCodeAt(0)) {
+    // capture range of next word (in case of a starting whitespace (WS) character - typical of indentation fixes)
+    if(lineStartCharCode === " ".charCodeAt(0)) {
       
-      const alNumRegExp = /[a-z0-9_]+/ig;
-      let match = alNumRegExp.exec(lineText);
+      const alphaNumRegExp = /[a-z0-9_]+/ig;
+      let match = alphaNumRegExp.exec(lineText);
+      // capture range of next alphaNumeric word
       if(match !== null) {
         startPos = new vscode.Position(fix.lineNo, match!.index + edit.start);
-        endPos = new vscode.Position(fix.lineNo, alNumRegExp!.lastIndex + edit.start);
+        endPos = new vscode.Position(fix.lineNo, alphaNumRegExp!.lastIndex + edit.start);
       } else {
         // assuming line is non-empty
         const nonWSRegExp = /[^\s]+/ig;
@@ -56,18 +58,19 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
       }
       customRange = new vscode.Range(startPos, endPos);
 
-    } else {
+    } else {  // if line starts with non-WS character
       
         let isAlphaNum = (charCode: number) => {
           return !(!(charCode > 47 && charCode < 58) && // (0-9)
           !(charCode > 64 && charCode < 91) && // (A-Z)
           !(charCode > 96 && charCode < 123)); // (a-z)
         };
-        if(isAlphaNum(startCharCode)) {
-          // underline next word (instead of a single alnum character)
+
+        if(isAlphaNum(lineStartCharCode)) {
+          // capture range of entire word (instead of a single alphaNumeric character)
           customRange = document.getWordRangeAtPosition(startPos);
         } else {
-          // underline only single character (in case of non-alnum character)
+          // capture range of only a single character (in case of non-alphaNum starting character)
           customRange = new vscode.Range(startPos, endPos);
         }
 
@@ -75,26 +78,27 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
 
     return customRange;
 
-    // return new vscode.Range(startPos, endPos);
   }
 
+  // updates code actions for the document
   public update(
-    document: vscode.TextDocument, 
-    fixes: pymacer.Fixes
-    ) {
+    document: vscode.TextDocument
+  ) {
+
     if(document) {
-      const fileNameParts = path.basename(document.uri.fsPath).split('.');
-      const fileExt = fileNameParts[fileNameParts.length-1];
+      const filePathNameInParts = path.basename(document.uri.fsPath).split('.');
+      const fileExtension = filePathNameInParts[filePathNameInParts.length-1];
       if (
         vscode.workspace
         .getConfiguration("python-hints")
         .get("enableDiagnostics", true) &&
-        fileExt === "py"
+        fileExtension === "py"
       ) {
-        const diagnosticLevel: number = vscode.workspace
+
+        // diagnosticLevel is an indicator to choosing a particular feedback level 
+        this.feedbackLevel = vscode.workspace
         .getConfiguration("python-hints")
         .get("diagnosticLevel", 0);
-        console.log(diagnosticLevel);
 
         let diagnostics: {
           code: string;
@@ -103,37 +107,19 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
           severity: vscode.DiagnosticSeverity;
           source: string;
         }[] = [];
-
-        // const diagnosticFlag: number = vscode.workspace
-        // .getConfiguration("python-hints")
-        // .get("activeHighlight", 0);
-
-        // if (diagnosticFlag > 0) {
         
-        const fixes: pymacer.Fixes = docStore.get(document.uri.fsPath)?.fixes;
+        const fixes: pymacer.Fixes = documentStore.get(document.uri.fsPath)?.fixes;
         fixes?.forEach((fix) => {
-          let diagnosticMsg: string = "";
-          if(this.feedbackLevel === FeedbackLevel.novice) {
-            diagnosticMsg = fix.feedback[0].fullText;
-          } else if(this.feedbackLevel === FeedbackLevel.expert) {
-            diagnosticMsg = fix.repairClasses[0];
-          }
-          // TODO?: Handle case of multiple errors/ edits on single line
+          let i = 0;
           fix.editDiffs?.forEach((edit) => {
-            const startPos = new vscode.Position(fix.lineNo, edit.start);
-            const endPos = new vscode.Position(fix.lineNo, edit.end + 1);
+            let diagnosticMsg: string = "";
+            if(this.feedbackLevel === FeedbackLevel.novice) {
+              diagnosticMsg = fix.feedback[i].fullText;
+            } else if(this.feedbackLevel === FeedbackLevel.expert) {
+              diagnosticMsg = fix.repairClasses[i];
+            }
+            i++;
             const editRange = this.getCustomRange(document, fix, edit);
-            // const editRange = edit.type === "insert" ?
-            //   document.getWordRangeAtPosition(startPos):
-            //   new vscode.Range(startPos, endPos);
-            // console.log(editRange?.start);
-            // console.log(editRange?.end);
-            // let editRange: vscode.Range | undefined;
-            // if (edit.type === "insert") {
-            //   editRange = document.getWordRangeAtPosition(startPos);
-            // } else {
-            //   editRange = new vscode.Range(startPos, endPos);
-            // }
             diagnostics.push({
               code: "",
               message: diagnosticMsg ?? "Error in this line",
@@ -163,9 +149,6 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
   ): vscode.CodeAction {
 
     let codeActionMsg: string = "Apply misc. repairs";
-    // let edits: pymacer.Edit[] = [];
-    // fix?.editDiffs.forEach((edit) => edits.push(edit));
-    // const edit = edits[0];
     if(fix !== undefined ) {
       const edit = fix?.editDiffs[0];      
       if(edit !== undefined) {
@@ -184,25 +167,15 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
       }
     }
 
-
     const action = new vscode.CodeAction(
       codeActionMsg,
       vscode.CodeActionKind.QuickFix
     );
-    // fix === undefined ? "" : fix.repairLine,
 
     action.diagnostics = [diagnostic];
     action.isPreferred = true;
 
     action.edit = new vscode.WorkspaceEdit();
-
-    /* Simply replace source with the corrected line - might disregard user formatting
-    // if(fix !== undefined) {
-    //   const position = new vscode.Position(fix!.lineNo, 0);
-    //   const editRange = document.getWordRangeAtPosition(position, new RegExp('.+'));
-    //   action.edit.replace(document.uri, editRange!, fix.repairLine);
-    // }
-    */
 
     fix?.editDiffs?.forEach((edit) => {
       const startPos = new vscode.Position(fix.lineNo, edit.start);

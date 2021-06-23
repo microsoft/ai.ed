@@ -1,8 +1,10 @@
 import * as vscode from "vscode";
-import { docStore } from "./extension";
+
+import { documentStore } from "./extension";
 import * as pymacer from "./pymacer";
 
 export class CodelensProvider implements vscode.CodeLensProvider {
+
   private codeLenses: vscode.CodeLens[] = [];
   private regex: RegExp;
   private _onDidChangeCodeLenses: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
@@ -21,6 +23,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     document: vscode.TextDocument,
     token: vscode.CancellationToken
   ): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
+
     if (
       vscode.workspace
         .getConfiguration("python-hints")
@@ -28,7 +31,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     ) {
       this.codeLenses = [];
       const filePath = document.uri.fsPath;
-      const fixes: pymacer.Fixes = docStore.get(filePath)?.fixes;
+      const fixes: pymacer.Fixes = documentStore.get(filePath)?.fixes;
       fixes?.forEach((fix) => {
         const position = new vscode.Position(fix.lineNo, 0);
         const range = document.getWordRangeAtPosition(
@@ -36,6 +39,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
           new RegExp(this.regex)
         );
         var text: string = "";
+        // Work-around: TAB character is displayed as '', hence adding <TAB> explicitly
         if (fix.repairLine[0] === " ") {
           text = "<TAB> ";
         }
