@@ -17,6 +17,10 @@
 	"contributes": {
 		"commands": [
 			{
+				"title": "Toggle Diagnostic Level",
+				"command": "python-hints.toggleDiagnosticLevel"
+			},
+			{
 				"title": "Toggle Diagnostics",
 				"command": "python-hints.toggleHints",
 				"icon": {
@@ -44,6 +48,12 @@
 			}
 		],
 		"keybindings": [
+			{
+				"command": "python-hints.toggleDiagnosticLevel",
+				"key": "ctrl+shift+t",
+				"mac": "ctrl+shift+t",
+				"when": "editorTextFocus"
+			},
 			{
 				"command": "python-hints.toggleHints",
 				"key": "ctrl+f1",

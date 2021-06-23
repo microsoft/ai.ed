@@ -88,10 +88,10 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
         .get("enableDiagnostics", true) &&
         fileExt === "py"
       ) {
-        const diagnosticLevel: number = vscode.workspace
+
+        this.feedbackLevel = vscode.workspace
         .getConfiguration("python-hints")
         .get("diagnosticLevel", 0);
-        console.log(diagnosticLevel);
 
         let diagnostics: {
           code: string;

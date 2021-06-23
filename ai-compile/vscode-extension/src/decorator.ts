@@ -114,15 +114,12 @@ export class Decorator {
     const deleteHighlights: vscode.DecorationOptions[] = [];
     const replaceHighlights: vscode.DecorationOptions[] = [];
 
-    const diagnosticLevel: number = vscode.workspace
-      .getConfiguration("python-hints")
-      .get("diagnosticLevel", 0);
-
-    const decoratorFlag: number = vscode.workspace
+    const activeHighlight: number = vscode.workspace
       .getConfiguration("python-hints")
       .get("activeHighlight", 0);
-    // console.log( "Updating decorations: " + flag );
-    if (decoratorFlag > 0) {
+    
+    if (activeHighlight !== 0) {
+
       const fixes: pymacer.Fixes = docStore.get(filePath)?.fixes;
       fixes?.forEach((fix) => {
         const position = new vscode.Position(fix.lineNo, 0);
@@ -130,23 +127,17 @@ export class Decorator {
           position,
           new RegExp(this.regEx)
         );
+
         let diagnosticMsg: string = "";
-        switch (diagnosticLevel) {
+
+        switch (activeHighlight) {
           case 1: {
             diagnosticMsg = fix.feedback[0].fullText;
             break;
           }
           case 2: {
-            diagnosticMsg = fix.repairClasses[0];
+            diagnosticMsg = fix.editDiffs[0].type.toUpperCase();
             break;
-          }
-          case 3: {
-            diagnosticMsg = fix.feedback[0].fullText;
-            break;
-          }
-          case 4: {
-            // already available in codelens
-            diagnosticMsg = fix.repairLine[0];
           }
         }
 
@@ -179,7 +170,7 @@ export class Decorator {
       });
     }
 
-    if (diagnosticLevel < 3) {
+    if (activeHighlight < 2) {
       activeEditor.setDecorations(this.decorationType, highlights);
       activeEditor.setDecorations(this.insertDecorationType, []);
       activeEditor.setDecorations(this.deleteDecorationType, []);

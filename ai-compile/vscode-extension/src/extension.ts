@@ -115,6 +115,19 @@ export function activate(context: vscode.ExtensionContext) {
     )
   );
 
+  disposables.push(
+    vscode.commands.registerCommand(
+      "python-hints.toggleDiagnosticLevel",
+      async function () {
+        let diagnosticLevel: number = vscode.workspace
+          .getConfiguration("python-hints")
+          .get("diagnosticLevel", 0);
+          diagnosticLevel = (diagnosticLevel + 1) % 2;
+        vscode.workspace
+          .getConfiguration("python-hints")
+          .update("diagnosticLevel", diagnosticLevel, true);
+      }));
+
   decorator.registerDecorator(context);
 
   eventDisposables.push(
