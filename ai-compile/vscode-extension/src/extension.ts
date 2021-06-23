@@ -106,11 +106,30 @@ export function activate(context: vscode.ExtensionContext) {
           .getConfiguration("python-hints")
           .update("diagnosticLevel", diagnosticLevel, true);
 
-        // Accomodate delay in propagating above configuration
-        setTimeout(() => {
-          decorator.updateDecorations();
-        }, 300);
-        // decorator.updateDecorations();
+        // TODO: Decide when to trigger execution of backend
+        const activeEditor = vscode.window.activeTextEditor;
+        if (activeEditor !== undefined) {
+          // vscode.workspace.getConfiguration( "python-hints" ).update( "enableCodeLens", true, true );
+          // the save event will itself handle compilation and fix suggestions
+          if (activeEditor.document.isDirty) {
+            activeEditor.document.save();
+          } else {
+            // document.save() doesn't trigger if document isn't dirty
+            const fixes = await pymacer.compileAndGetFix(
+              activeEditor.document,
+              docStore
+            );
+
+            console.log(fixes);
+            // Accomodate delay in propagating above configuration
+            setTimeout(() => {
+              decorator.updateDecorations();
+            }, 300);
+            // decorator.updateDecorations();
+          }
+        }
+
+
       }
     )
   );
