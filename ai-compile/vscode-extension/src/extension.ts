@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
+import * as fs from "fs";
 
 import { Decorator } from "./decorator";
 import { EduCodeActionProvider } from "./codeActionProvider";
@@ -8,12 +9,78 @@ import * as pymacer from "./pymacer";
 let disposables: vscode.Disposable[] = [];
 let eventDisposables: vscode.Disposable[] = [];
 
+export enum DisplayDiagnosticLevel {
+  none,
+  novice,
+  expert
+}
+
 // stores file-wise history of fixes
 export let documentStore: Map<string, pymacer.DocumentStore>;
+
+export let setTimeOut: number;
+export let requestTimeOut: number;
+export let shellCmdTimeOut: number;
+
+export function readConfigFile(
+  property: string
+): any {
+
+  let retVal = undefined;
+  let extensionPackageJson: string = fs.readFileSync( path.resolve( __dirname,
+      "../data/pyedu-config.json" ), "utf8" );
+  let extensionPackage = JSON.parse( extensionPackageJson );
+  if( extensionPackage.hasOwnProperty( property ) ) {
+      retVal = extensionPackage[ property ];
+  }
+  return retVal;
+
+}
+
+function initExtensionConfiguration() {
+
+  try {
+    const displayUpdate = readConfigFile("displayUpdate");
+    setTimeOut = displayUpdate["setTimeOut"];
+
+    const commandExecution = readConfigFile("commandExecution");
+    requestTimeOut = commandExecution["requestTimeOut"];
+    shellCmdTimeOut = commandExecution["shellCmdTimeOut"];
+    
+    const defaultConfigProperties = readConfigFile("defaultConfigProperties");
+    const enableCodeLens = defaultConfigProperties["enableCodeLens"] === "true";
+    const webServerPath = defaultConfigProperties["webServerPath"];
+    const diagnosticLevel = parseInt(defaultConfigProperties["diagnosticLevel"]);
+    const enableDiagnostics = defaultConfigProperties["enableDiagnostics"] === "true";
+    const activeHighlight = parseInt(defaultConfigProperties["activeHighlight"]);
+
+    vscode.workspace
+    .getConfiguration("python-hints")
+    .update("enableCodeLens", enableCodeLens, true);
+    vscode.workspace
+    .getConfiguration("python-hints")
+    .update("webServerPath", webServerPath, true);
+    vscode.workspace
+    .getConfiguration("python-hints")
+    .update("diagnosticLevel", diagnosticLevel, true);
+    vscode.workspace
+    .getConfiguration("python-hints")
+    .update("enableDiagnostics", enableDiagnostics, true);
+    vscode.workspace
+    .getConfiguration("python-hints")
+    .update("activeHighlight", activeHighlight, true);
+
+  } catch {
+    console.log("Missing/ Corrupt pyedu-config.json");
+  }
+
+}
 
 export function activate(context: vscode.ExtensionContext) {
 
   console.log("Extension 'python-hints' is now active!");
+
+  initExtensionConfiguration();
 
   documentStore = new Map();
   const decorator: Decorator = new Decorator();
@@ -52,12 +119,15 @@ export function activate(context: vscode.ExtensionContext) {
               activeEditor.document,
               documentStore
             );
-
-            console.log(fixes);
+            if(fixes !== undefined) {
+              console.log(fixes);
+            } else {
+              console.log("PyMACER couldn't diagnose any errors ");
+            }
             // TODO: What is the right amount of time to allow the previous configuration propagation?
             setTimeout(() => {
               eduCodeActionProvider.update(vscode.window.activeTextEditor!.document);
-            }, 300);
+            }, setTimeOut);
           }
         }
       }
@@ -70,7 +140,7 @@ export function activate(context: vscode.ExtensionContext) {
       async function () {
         let activeHighlight: number = vscode.workspace
           .getConfiguration("python-hints")
-          .get("activeHighlight", 0);
+          .get("activeHighlight", DisplayDiagnosticLevel.none);
           activeHighlight = (activeHighlight + 1) % 3;
         vscode.workspace
           .getConfiguration("python-hints")
@@ -92,7 +162,7 @@ export function activate(context: vscode.ExtensionContext) {
             // Accomodate delay in propagating above configuration
             setTimeout(() => {
               decorator.updateDecorations();
-            }, 300);
+            }, setTimeOut);
           }
         }
       }
@@ -105,7 +175,7 @@ export function activate(context: vscode.ExtensionContext) {
       async function () {
         let diagnosticLevel: number = vscode.workspace
           .getConfiguration("python-hints")
-          .get("diagnosticLevel", 0);
+          .get("diagnosticLevel", DisplayDiagnosticLevel.none);
           diagnosticLevel = (diagnosticLevel + 1) % 2;
         vscode.workspace
           .getConfiguration("python-hints")
@@ -134,7 +204,7 @@ export function activate(context: vscode.ExtensionContext) {
         decorator.updateDecorations();
         setTimeout(() => {
           eduCodeActionProvider.update(vscode.window.activeTextEditor!.document);
-        }, 300);
+        }, setTimeOut);
       }
   })
   );

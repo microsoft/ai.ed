@@ -10,8 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onLanguage:python",
-		"onCommand:python-hints.toggleHints"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -69,15 +68,15 @@
 				},
 				"python-hints.diagnosticLevel": {
 					"type": "integer",
-					"default": 3
-				},
-				"python-hints.activeHighlight": {
-					"type": "integer",
 					"default": 0
 				},
 				"python-hints.enableDiagnostics": {
 					"type": "boolean",
 					"default": false
+				},
+				"python-hints.activeHighlight": {
+					"type": "integer",
+					"default": 0
 				}
 			}
 		},

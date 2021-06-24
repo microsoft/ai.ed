@@ -98,7 +98,7 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
         // diagnosticLevel is an indicator to choosing a particular feedback level 
         this.feedbackLevel = vscode.workspace
         .getConfiguration("python-hints")
-        .get("diagnosticLevel", 0);
+        .get("diagnosticLevel", FeedbackLevel.novice);
 
         let diagnostics: {
           code: string;

@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
-import { documentStore } from "./extension";
 import * as pymacer from "./pymacer";
+import { documentStore, DisplayDiagnosticLevel } from "./extension";
 
 export class Decorator {
   
@@ -104,9 +104,9 @@ export class Decorator {
     // an indicator to choosing a particular feedback level 
     const activeHighlight: number = vscode.workspace
       .getConfiguration("python-hints")
-      .get("activeHighlight", 0);
+      .get("activeHighlight", DisplayDiagnosticLevel.none);
     
-    if (activeHighlight !== 0) {
+    if (activeHighlight !== DisplayDiagnosticLevel.none) {
 
       const fixes: pymacer.Fixes = documentStore.get(filePath)?.fixes;
       fixes?.forEach((fix) => {
@@ -119,11 +119,11 @@ export class Decorator {
         let diagnosticMsg: string = "";
 
         switch (activeHighlight) {
-          case 1: {
+          case DisplayDiagnosticLevel.novice: {
             diagnosticMsg = fix.feedback[0].fullText;
             break;
           }
-          case 2: {
+          case DisplayDiagnosticLevel.expert: {
             diagnosticMsg = fix.editDiffs[0].type.toUpperCase();
             break;
           }
@@ -159,7 +159,7 @@ export class Decorator {
       });
     }
 
-    if (activeHighlight < 2) {
+    if (activeHighlight < DisplayDiagnosticLevel.expert) {
       activeEditor.setDecorations(this.decorationType, highlights);
       activeEditor.setDecorations(this.insertDecorationType, []);
       activeEditor.setDecorations(this.deleteDecorationType, []);

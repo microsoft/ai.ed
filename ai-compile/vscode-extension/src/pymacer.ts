@@ -8,6 +8,8 @@ import { exec } from "child_process";
 import axios from "axios";
 import * as https from "https";
 
+import { requestTimeOut, shellCmdTimeOut } from "./extension";
+
 // request to backend server
 export interface Payload {
   source: string;
@@ -78,9 +80,6 @@ export class Document implements DocumentStore {
 export const serverURL: string | undefined = vscode.workspace
   .getConfiguration("python-hints")
   .get("webServerPath");
-
-export const requestTimeOut: number = 100000;
-export const shellCmdTimeOut: number = 10000;
 
 export async function compileAndGetFix(
   document: vscode.TextDocument,
@@ -187,6 +186,7 @@ export async function getFix(
 
   let result: Fixes | undefined = undefined;
   try {
+
     const response = await axios.post(serverURL, data, {
       timeout: requestTimeOut,
       httpsAgent: agent,

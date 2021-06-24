@@ -1,0 +1,16 @@
+{
+	"displayUpdate": {
+		"setTimeOut": 300		
+	},
+	"commandExecution": {
+		"requestTimeOut": 100000,
+		"shellCmdTimeOut": 10000
+	},
+	"defaultConfigProperties": {
+		"enableCodeLens": false,
+		"webServerPath": "http://127.0.0.1:5000/getfixes",
+		"diagnosticLevel": 0,
+		"enableDiagnostics": false,
+		"activeHighlight": 0		
+	}
+}
