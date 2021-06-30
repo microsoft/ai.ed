@@ -13,7 +13,7 @@ export function initialize(context: vscode.ExtensionContext, mode: number){
         tutor,
     );
 	
-	if (vscode.window.activeTextEditor) {
+    if (vscode.window.activeTextEditor) {
         tutor.update(vscode.window.activeTextEditor.document);
     }
 
