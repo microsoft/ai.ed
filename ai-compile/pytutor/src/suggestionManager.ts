@@ -1,25 +1,27 @@
 /*
-    Manager suggestion by consulting with code action provider .
+    Manages suggestion by consulting with code action provider .
 */
-import { TutorCodeActionProvider } from "./tutorCodeActionProvider";
-import * as vscode from 'vscode';
 
-export function initialize(context: vscode.ExtensionContext, mode: number){
-    let tutor = new TutorCodeActionProvider();
-    tutor.setMode(mode);
+import * as vscode from 'vscode';
+import { RepairEngineTypes } from './repairEngine';
+import { TutorCodeActionProvider } from "./tutorCodeActionProvider";
+import { Modes } from "./util";
+
+export function initialize(context: vscode.ExtensionContext, mode: Modes){
+    let tutorAction = new TutorCodeActionProvider(mode, RepairEngineTypes.PyMacer);
 
     vscode.languages.registerCodeActionsProvider(
         "python",
-        tutor,
+        tutorAction,
     );
 	
     if (vscode.window.activeTextEditor) {
-        tutor.update(vscode.window.activeTextEditor.document);
+        tutorAction.update();
     }
 
     context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(event => {
         if (event) {
-            tutor.update(event.document);
+            tutorAction.update();
         }
     }));
 }
