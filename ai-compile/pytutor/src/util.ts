@@ -20,7 +20,9 @@ export enum Modes {
 	Expert = EXPERT
 }
 
-export function getModeIcon(mode: number) {
+export function getModeIcon(context: vscode.ExtensionContext) {
+	let globalState: vscode.Memento = context.globalState;
+	let mode = globalState.get(MODE_MEMENTO_NAME, Modes.Beginner);
 	if (mode === Modes.Beginner) {
 		return BEGINNER_ICON;
 	}

@@ -1,8 +1,15 @@
 import * as vscode from 'vscode';
-import { initialize as initializeModeManager } from './modeManager';
-import { initialize as initializeSuggestionManager } from './suggestionManager';
+import { Manager } from './manager';
+import { RepairEngineTypes } from './repairEngine';
+import { TutorCodeActionProvider } from './tutorCodeActionProvider';
 
 export async function activate(context: vscode.ExtensionContext) {
-    let mode = initializeModeManager(context);
-    initializeSuggestionManager(context, mode);
+    new Manager(context);
+
+    let tutorAction = new TutorCodeActionProvider(context, RepairEngineTypes.PyMacer);
+    vscode.languages.registerCodeActionsProvider(
+        "python",
+        tutorAction,
+    );
+    
 }

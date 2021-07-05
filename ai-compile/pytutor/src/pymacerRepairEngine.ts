@@ -1,12 +1,13 @@
 /*
 	PyMacer repair engine, implements the generic interface RepairEngine.
+	This code is hacky because of no control over what pymacer returns.
 */
 
 import * as vscode from 'vscode';
 import * as https from 'https';
 import axios from 'axios';
 import { RepairEngine } from './repairEngine';
-import { compiles, Modes } from './util';
+import { compiles, EXTENSION_NAME, getModeIcon } from './util';
 
 const PYMACER_REQUEST_TIMEOUT = 10000;
 const PYMACER_SERVER_URL = "http://127.0.0.1:5000/getfixes";
@@ -38,26 +39,30 @@ interface PyMacerResponse {
 	repairClasses: string[];				// short-hand name for the type of repair
 }
 
-export class PyMacer implements RepairEngine {
-	mode: Modes = Modes.Beginner;
-	responses:  PyMacerResponse[] = [];
-	async process(mode: Modes): Promise<boolean>{
-		this.mode = mode;
-		this.responses = [];				
+export class PyMacerRepairEngine implements RepairEngine {
+	context: vscode.ExtensionContext;
+	responses: PyMacerResponse[] = [];
+	diagnosticToCodeActionMap: Map<vscode.Diagnostic, vscode.CodeAction> = new Map();
+	constructor(context: vscode.ExtensionContext){
+		this.context = context;
+	}
+	async process(): Promise<boolean> {
+		this.responses = [];
+		this.diagnosticToCodeActionMap.clear();
 		let didCompile = await compiles(PYTHON_PATH);
-		if (didCompile === false){
-			console.log('Syntax Error... Consulting PyMacer')		
+		if (didCompile === false) {
+			console.log('Syntax Error... Consulting PyMacer')
 			let data = {
 				source: vscode.window.activeTextEditor?.document.getText(),
 				lastEditLine: vscode.window.activeTextEditor?.selection.active.line
 			};
 			try {
 				const pymacerResponse = await axios.post(
-					PYMACER_SERVER_URL, 
-					JSON.parse(JSON.stringify(data)), 
+					PYMACER_SERVER_URL,
+					JSON.parse(JSON.stringify(data)),
 					{
 						timeout: PYMACER_REQUEST_TIMEOUT,
-						httpsAgent: new https.Agent({rejectUnauthorized: false})
+						httpsAgent: new https.Agent({ rejectUnauthorized: false })
 					}
 				);
 				this.responses = pymacerResponse.data.repairs as PyMacerResponse[];
@@ -66,14 +71,53 @@ export class PyMacer implements RepairEngine {
 				return false;
 			}
 		}
-		return true;	
+		this.populateDiagnosticsAndCodeActions();
+		return true;
 	}
-	populateCodeActions(): Map<vscode.Diagnostic, vscode.CodeAction> {
-		for(let i = 0; i < this.responses.length; i++){
+
+	populateDiagnosticsAndCodeActions(){
+		for (let i = 0; i < this.responses.length; i++) {
 			let response = this.responses[i];
-			// TODO: Map diagnostic --> action
-	
+			let code = vscode.window.activeTextEditor?.document.getText();
+			if (code === undefined){
+				code = "";
+			}
+			let range = undefined; 
+			try {
+				range = new vscode.Range(
+						new vscode.Position(response.lineNo, response.editDiffs[0].start),
+						new vscode.Position(response.lineNo, response.editDiffs[0].end + 1)
+				)
+			}
+			catch(exception)
+			{
+				range = new vscode.Range(
+					new vscode.Position(response.lineNo, 0),
+					new vscode.Position(response.lineNo, code[response.lineNo].length)
+				);
+			}
+
+			let diagnosticMessage = "";
+			let actionMessage = "";
+			try{
+				diagnosticMessage = response.feedback[0].msg1 + response.feedback[0].msg2;
+				actionMessage = response.feedback[0].fullText.split(response.feedback[0].msg2)[1].trim();				
+			}
+			catch{
+				diagnosticMessage = "";
+				actionMessage = "";
+			}
+			let diagnostic = {
+				range: range,
+				message: diagnosticMessage,
+				severity: vscode.DiagnosticSeverity.Warning,
+				source: EXTENSION_NAME + getModeIcon(this.context)				
+			}
+			let action = new vscode.CodeAction(
+				actionMessage,
+				vscode.CodeActionKind.QuickFix
+			);
+			this.diagnosticToCodeActionMap.set(diagnostic, action);
 		}
-		return new Map();
-	}	
+	}
 }
