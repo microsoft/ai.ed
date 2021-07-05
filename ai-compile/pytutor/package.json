@@ -14,26 +14,25 @@
 	],
 	"icon": "icons/icon.png",
 	"main": "./out/extension.js",
-
 	"contributes": {
-        "commands": [
-            {
-                "command": "python-tutor.beginner-mode",
-                "title": "Beginner Mode",
-                "icon": {
-                    "light": "./icons/expert.svg",
-                    "dark": "./icons/expert.svg"
-                }
-            },			
-            {
-                "command": "python-tutor.expert-mode",
-                "title": "Expert Mode",
-                "icon": {
-                    "light": "./icons/beginner.svg",
-                    "dark": "./icons/beginner.svg"
-                }
-            }            
-        ],
+		"commands": [
+			{
+				"command": "python-tutor.beginner-mode",
+				"title": "Beginner Mode",
+				"icon": {
+					"light": "./icons/expert.svg",
+					"dark": "./icons/expert.svg"
+				}
+			},
+			{
+				"command": "python-tutor.expert-mode",
+				"title": "Expert Mode",
+				"icon": {
+					"light": "./icons/beginner.svg",
+					"dark": "./icons/beginner.svg"
+				}
+			}
+		],
 		"menus": {
 			"editor/title": [
 				{
@@ -48,7 +47,7 @@
 				}
 			]
 		}
-    },
+	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
