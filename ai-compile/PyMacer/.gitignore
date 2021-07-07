@@ -17,7 +17,11 @@
 /ML/micro_data
 
 # venv
+/venv
+
+# pymacer
 /pymacer
 
 # test cache
 /.pytest_cache
+
