@@ -1,2 +1,8 @@
-ai-compile/WebServer/WebServer/bin/
-ai-compile/WebServer/WebServer/obj/
+src/pytutor/out
+src/pytutor/dist
+src/pytutor/package-lock.json
+node_modules
+.vscode-test/
+*.vsix
+src/pytutor/tmp
+src/pytutor/.vs
