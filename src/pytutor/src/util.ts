@@ -10,7 +10,7 @@ export const MODE_MEMENTO_NAME = "Python_Tutor_Mode";
 export const EXTENSION_NAME = "Python Tutor";
 export const BEGINNER_ICON = '👩‍🎓';
 export const EXPERT_ICON = '🚀';
-export const TEMP_FILE_NAME = 'temp.py'
+export const TEMP_FILE_NAME = 'temp.py';
 
 const fs = require('fs').promises;
 const COMPILE_TIMEOUT = 100000;
@@ -27,14 +27,14 @@ export function getModeIcon(context: vscode.ExtensionContext) {
 		return BEGINNER_ICON;
 	}
 	else {
-		return EXPERT_ICON
+		return EXPERT_ICON;
 	}
 }
 
 export async function compiles(pythonPath: string): Promise<boolean> {
 	let currentCodeSnapshot = vscode.window.activeTextEditor?.document.getText();
 	let tempFilePath = join(tmpdir(), TEMP_FILE_NAME);
-	
+
 	await fs.writeFile(tempFilePath, currentCodeSnapshot);
 	try {
 		const execute = promisify(exec);
@@ -45,10 +45,11 @@ export async function compiles(pythonPath: string): Promise<boolean> {
 				timeout: COMPILE_TIMEOUT,
 			}
 		);
-	} catch (exception) {
+	}
+	catch (exception) {
 		console.debug("Compilation failed: " + exception['message']);
 		return false;
 	}
-	console.debug("Compiled successfully.")
+	console.debug("Compiled successfully.");
 	return true;
 }

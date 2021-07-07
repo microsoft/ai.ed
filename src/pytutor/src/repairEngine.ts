@@ -6,10 +6,10 @@
 export const PYMACER = 1;
 
 export enum RepairEngineTypes {
-	PyMacer = PYMACER,
+    PyMacer = PYMACER,
 }
 
-export interface RepairEngine{
-	diagnosticToCodeActionMap: Map<import("vscode").Diagnostic, import("vscode").CodeAction>;
-    process():Promise<boolean>;	
+export interface RepairEngine {
+    diagnosticToCodeActionMap: Map<import("vscode").Diagnostic, import("vscode").CodeAction>;
+    process(): Promise<boolean>;
 }

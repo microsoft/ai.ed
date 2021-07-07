@@ -1,7 +1,7 @@
 src/pytutor/out
 src/pytutor/dist
 src/pytutor/package-lock.json
-node_modules
+src/pytutor/node_modules
 .vscode-test/
 *.vsix
 src/pytutor/tmp

@@ -12,13 +12,13 @@ export class TutorCodeActionProvider implements vscode.CodeActionProvider {
 		"PythonTutor"
 	);
 
-	public constructor(context: vscode.ExtensionContext, repairEngineType: RepairEngineTypes) {			
-		if (repairEngineType === RepairEngineTypes.PyMacer){
-			this.repairEngine = new PyMacerRepairEngine(context);			
+	public constructor(context: vscode.ExtensionContext, repairEngineType: RepairEngineTypes) {
+		if (repairEngineType === RepairEngineTypes.PyMacer) {
+			this.repairEngine = new PyMacerRepairEngine(context);
 		}
-		else{
+		else {
 			this.repairEngine = undefined!;
-		}		
+		}
 		if (vscode.window.activeTextEditor) {
 			this.update(vscode.window.activeTextEditor.document);
 		}
@@ -33,15 +33,15 @@ export class TutorCodeActionProvider implements vscode.CodeActionProvider {
 
 	public async update(document: vscode.TextDocument) {
 		let status = await this.repairEngine.process();
-		if (!status){
-			console.error('Consultation with repair engine failed.')
+		if (!status) {
+			console.error('Consultation with repair engine failed.');
 		}
 		let diagnostics = [];
-		for(let diagnostic of this.repairEngine.diagnosticToCodeActionMap.keys()){
+		for (let diagnostic of this.repairEngine.diagnosticToCodeActionMap.keys()) {
 			diagnostics.push(diagnostic);
 		}
 		this.diagnosticCollection.set(document.uri, diagnostics);
-		
+
 	}
 
 	public provideCodeActions(

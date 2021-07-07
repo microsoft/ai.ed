@@ -11,7 +11,7 @@ import { compiles, EXTENSION_NAME, getModeIcon } from './util';
 
 const PYMACER_REQUEST_TIMEOUT = 10000;
 const PYMACER_SERVER_URL = "http://127.0.0.1:5000/getfixes";
-const PYTHON_PATH = "C://venv//pymacer//Scripts//python"
+const PYTHON_PATH = "C://venv//pymacer//Scripts//python";
 
 interface PyMacerEditSuggestion {
 	type: string;           // type of edit operation - insert/ delete/ replace
@@ -43,7 +43,7 @@ export class PyMacerRepairEngine implements RepairEngine {
 	context: vscode.ExtensionContext;
 	responses: PyMacerResponse[] = [];
 	diagnosticToCodeActionMap: Map<vscode.Diagnostic, vscode.CodeAction> = new Map();
-	constructor(context: vscode.ExtensionContext){
+	constructor(context: vscode.ExtensionContext) {
 		this.context = context;
 	}
 	async process(): Promise<boolean> {
@@ -51,7 +51,7 @@ export class PyMacerRepairEngine implements RepairEngine {
 		this.diagnosticToCodeActionMap.clear();
 		let didCompile = await compiles(PYTHON_PATH);
 		if (didCompile === false) {
-			console.log('Syntax Error... Consulting PyMacer')
+			console.log('Syntax Error... Consulting PyMacer');
 			let data = {
 				source: vscode.window.activeTextEditor?.document.getText(),
 				lastEditLine: vscode.window.activeTextEditor?.selection.active.line
@@ -75,22 +75,21 @@ export class PyMacerRepairEngine implements RepairEngine {
 		return true;
 	}
 
-	populateDiagnosticsAndCodeActions(){
+	populateDiagnosticsAndCodeActions() {
 		for (let i = 0; i < this.responses.length; i++) {
 			let response = this.responses[i];
 			let code = vscode.window.activeTextEditor?.document.getText();
-			if (code === undefined){
+			if (code === undefined) {
 				code = "";
 			}
-			let range = undefined; 
+			let range = undefined;
 			try {
 				range = new vscode.Range(
-						new vscode.Position(response.lineNo, response.editDiffs[0].start),
-						new vscode.Position(response.lineNo, response.editDiffs[0].end + 1)
-				)
+					new vscode.Position(response.lineNo, response.editDiffs[0].start),
+					new vscode.Position(response.lineNo, response.editDiffs[0].end + 1)
+				);
 			}
-			catch(exception)
-			{
+			catch (exception) {
 				range = new vscode.Range(
 					new vscode.Position(response.lineNo, 0),
 					new vscode.Position(response.lineNo, code[response.lineNo].length)
@@ -99,11 +98,11 @@ export class PyMacerRepairEngine implements RepairEngine {
 
 			let diagnosticMessage = "";
 			let actionMessage = "";
-			try{
+			try {
 				diagnosticMessage = response.feedback[0].msg1 + response.feedback[0].msg2;
-				actionMessage = response.feedback[0].fullText.split(response.feedback[0].msg2)[1].trim();				
+				actionMessage = response.feedback[0].fullText.split(response.feedback[0].msg2)[1].trim();
 			}
-			catch{
+			catch {
 				diagnosticMessage = "";
 				actionMessage = "";
 			}
@@ -111,8 +110,8 @@ export class PyMacerRepairEngine implements RepairEngine {
 				range: range,
 				message: diagnosticMessage,
 				severity: vscode.DiagnosticSeverity.Warning,
-				source: EXTENSION_NAME + getModeIcon(this.context)				
-			}
+				source: EXTENSION_NAME + getModeIcon(this.context)
+			};
 			let action = new vscode.CodeAction(
 				actionMessage,
 				vscode.CodeActionKind.QuickFix
