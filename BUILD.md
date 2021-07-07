@@ -15,6 +15,8 @@ Both of these components are in the `ai-compile` directory.
 
 ## PyMACER
 
+Clone the [PyMACER](https://github.com/purushottamkar/pymacer) repo in `ai-compile\PyMacer` folder.
+
 PyMACER uses the edlib package, which wraps a C++ library. This package does not have pre-built Windows binaries ([Issue #178: Binary wheels for Windows](https://github.com/Martinsos/edlib/issues/178)), so you will need to build from source during `pip install`. To prepare for this, verify that you have the [Desktop development with C++](https://docs.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-160) workload selected in the [Visual Studio 2019 installer](https://docs.microsoft.com/en-us/visualstudio/install/modify-visual-studio?view=vs-2019).
 
 Then, execute the following commands using the [x64 Native Tools Command Prompt for VS 2019](https://docs.microsoft.com/en-us/cpp/build/how-to-enable-a-64-bit-visual-cpp-toolset-on-the-command-line?view=msvc-160) so that Python will have access to the required C++ build tools. The first line will create a virtual environment for Python. Here, we will assume this environment will be located in `C:\venv\pymacer`. Change your current directory to `ai-compile\PyMacer` before executing the commands.
@@ -22,7 +24,7 @@ Then, execute the following commands using the [x64 Native Tools Command Prompt 
 ```
 python -m venv C:\venv\pymacer
 C:\venv\pymacer\Scripts\activate
-python -m pip install -r requirements.txt
+python -m pip install -r .\pymacer\pymacer-vscode\requirements.txt
 ```
 You may see some error messages saying `ERROR: After October 2020 you may experience ...`. You can ignore that. 
 
