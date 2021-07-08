@@ -5,6 +5,7 @@ import * as fs from "fs";
 import { Decorator } from "./decorator";
 import { EduCodeActionProvider } from "./codeActionProvider";
 import * as pymacer from "./pymacer";
+import { isPythonFile } from "./util";
 
 let disposables: vscode.Disposable[] = [];
 let eventDisposables: vscode.Disposable[] = [];
@@ -124,7 +125,6 @@ export function activate(context: vscode.ExtensionContext) {
             } else {
               console.log("PyMACER couldn't diagnose any errors ");
             }
-            // TODO: What is the right amount of time to allow the previous configuration propagation?
             setTimeout(() => {
               eduCodeActionProvider.update(vscode.window.activeTextEditor!.document);
             }, setTimeOut);
@@ -188,12 +188,9 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onWillSaveTextDocument(async (saveEvent) => {
       console.log("Document Saved...");
 
-      const filePathParts = path.basename(saveEvent.document.uri.fsPath).split(".");
-      const fileExtension = filePathParts[filePathParts.length-1];
-      // TODO: Need to distinguish first time save from rest? - as it captures wrong name (Untitled*) - how to then check the file after saving? - another event?
       if (
         saveEvent.reason === vscode.TextDocumentSaveReason.Manual &&
-        fileExtension === "py"
+        isPythonFile(saveEvent.document)
       ) {
         const fixes = await pymacer.compileAndGetFix(
           saveEvent.document,
@@ -212,9 +209,11 @@ export function activate(context: vscode.ExtensionContext) {
   disposables.forEach((item) => context.subscriptions.push(item));
 
   eventDisposables.forEach((item) => context.subscriptions.push(item));
+
 }
 
 export function deactivate() {
+
   if (disposables) {
     disposables.forEach((item) => item.dispose());
   }
@@ -224,4 +223,5 @@ export function deactivate() {
 
   disposables = [];
   eventDisposables = [];
+
 }

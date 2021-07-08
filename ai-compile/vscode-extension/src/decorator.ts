@@ -136,24 +136,16 @@ export class Decorator {
           const startPos = new vscode.Position(fix.lineNo, edit.start);
           const endPos = new vscode.Position(fix.lineNo, edit.end + 1);
           const range = new vscode.Range(startPos, endPos);
+          const decoration = {
+            range: range,
+            hoverMessage: diagnosticMsg,
+          };
           if (edit.type === "insert") {
-            const insertDecoration = {
-              range: range,
-              hoverMessage: diagnosticMsg,
-            };
-            insertHighlights.push(insertDecoration);
+            insertHighlights.push(decoration);
           } else if (edit.type === "delete") {
-            const deleteDecoration = {
-              range: range,
-              hoverMessage: diagnosticMsg,
-            };
-            deleteHighlights.push(deleteDecoration);
+            deleteHighlights.push(decoration);
           } else {
-            const replaceDecoration = {
-              range: range,
-              hoverMessage: diagnosticMsg,
-            };
-            replaceHighlights.push(replaceDecoration);
+            replaceHighlights.push(decoration);
           }
         });
       });

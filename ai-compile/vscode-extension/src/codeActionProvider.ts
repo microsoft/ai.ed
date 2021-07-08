@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import * as path from "path";
 
+import { alphaNumRegExp, isAlphaNum, nonWhiteSpaceRegExp, isPythonFile, Diagnostic } from "./util"; "util";
 import * as pymacer from "./pymacer";
 import { documentStore } from "./extension";
 
@@ -43,7 +43,6 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
     // capture range of next word (in case of a starting whitespace (WS) character - typical of indentation fixes)
     if(lineStartCharCode === " ".charCodeAt(0)) {
       
-      const alphaNumRegExp = /[a-z0-9_]+/ig;
       let match = alphaNumRegExp.exec(lineText);
       // capture range of next alphaNumeric word
       if(match !== null) {
@@ -51,21 +50,13 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
         endPos = new vscode.Position(fix.lineNo, alphaNumRegExp!.lastIndex + edit.start);
       } else {
         // assuming line is non-empty
-        const nonWSRegExp = /[^\s]+/ig;
-        match = nonWSRegExp.exec(lineText);
+        match = nonWhiteSpaceRegExp.exec(lineText);
         startPos = new vscode.Position(fix.lineNo, match!.index + edit.start);
-        endPos = new vscode.Position(fix.lineNo, nonWSRegExp!.lastIndex + edit.start);
+        endPos = new vscode.Position(fix.lineNo, nonWhiteSpaceRegExp!.lastIndex + edit.start);
       }
       customRange = new vscode.Range(startPos, endPos);
 
     } else {  // if line starts with non-WS character
-      
-        let isAlphaNum = (charCode: number) => {
-          return !(!(charCode > 47 && charCode < 58) && // (0-9)
-          !(charCode > 64 && charCode < 91) && // (A-Z)
-          !(charCode > 96 && charCode < 123)); // (a-z)
-        };
-
         if(isAlphaNum(lineStartCharCode)) {
           // capture range of entire word (instead of a single alphaNumeric character)
           customRange = document.getWordRangeAtPosition(startPos);
@@ -86,13 +77,11 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
   ) {
 
     if(document) {
-      const filePathNameInParts = path.basename(document.uri.fsPath).split('.');
-      const fileExtension = filePathNameInParts[filePathNameInParts.length-1];
       if (
         vscode.workspace
         .getConfiguration("python-hints")
         .get("enableDiagnostics", true) &&
-        fileExtension === "py"
+        isPythonFile(document)
       ) {
 
         // diagnosticLevel is an indicator to choosing a particular feedback level 
@@ -100,13 +89,7 @@ export class EduCodeActionProvider implements vscode.CodeActionProvider {
         .getConfiguration("python-hints")
         .get("diagnosticLevel", FeedbackLevel.novice);
 
-        let diagnostics: {
-          code: string;
-          message: string;
-          range: vscode.Range;
-          severity: vscode.DiagnosticSeverity;
-          source: string;
-        }[] = [];
+        let diagnostics: Diagnostic[] = [];
         
         const fixes: pymacer.Fixes = documentStore.get(document.uri.fsPath)?.fixes;
         fixes?.forEach((fix) => {

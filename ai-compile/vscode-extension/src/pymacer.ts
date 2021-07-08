@@ -89,8 +89,7 @@ export async function compileAndGetFix(
   let fixes: Fixes = undefined;
   let docHistory = documentStore.get(filePath);
 
-  // TODO: What if the document was left in an inconsistent state previously
-  // Can handle this case in the document open/ close event?
+  // Can handle the case document was left in an inconsistent state previously in the document open/ close event?
 
   // compile if file has either not been examined previously (in the history of the extension) ||
   // it has been modified
@@ -113,8 +112,7 @@ export async function compileAndGetFix(
 }
 
 async function compileAndGetFixHelper(): Promise<Fixes> {
-  // TODO: What if user changes tab immediately? - activeEditor changes - cancellation token?
-  //* Or find an alternate way to get fullText of document and simply pass document along
+
   const activeEditor = vscode.window.activeTextEditor;
 
   if (activeEditor !== undefined) {
