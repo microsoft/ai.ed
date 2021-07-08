@@ -1,3 +1,4 @@
+
 def rainfall(measurements):
     sum = 0
     count = 0

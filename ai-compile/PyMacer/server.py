@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return {"Hello": "World"}
+    return "Flask Server running..."
 
 
 @app.route("/getfixes", methods=["POST"])

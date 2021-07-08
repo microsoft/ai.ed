@@ -120,7 +120,7 @@ export class Decorator {
 
         switch (activeHighlight) {
           case DisplayDiagnosticLevel.novice: {
-            diagnosticMsg = fix.feedback[0].fullText;
+            diagnosticMsg = fix.repairClasses[0];
             break;
           }
           case DisplayDiagnosticLevel.expert: {
