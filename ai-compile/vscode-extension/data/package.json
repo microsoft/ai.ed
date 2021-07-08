@@ -17,11 +17,19 @@
 		"commands": [
 			{
 				"title": "Toggle Diagnostics",
-				"command": "python-hints.toggleHints"
+				"command": "python-hints.toggleHints",
+				"icon": {
+					"light": "./media/search.svg",
+					"dark": "./media/search.svg"
+				}
 			},
 			{
 				"title": "Toggle Highlight",
-				"command": "python-hints.toggleHighlight"
+				"command": "python-hints.toggleHighlight",
+				"icon": {
+					"light": "./media/highlighter-circle-icon.svg",
+					"dark": "./media/highlighter-circle-icon.svg"
+				}
 			},
 			{
 				"title": "Enable CodeLens",
@@ -71,6 +79,20 @@
 					"default": 0
 				}
 			}
+		},
+		"menus": {
+			"editor/title": [
+				{
+					"when": "resourceLangId == python",
+					"command": "python-hints.toggleHints",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == python",
+					"command": "python-hints.toggleHighlight",
+					"group": "navigation"
+				}
+			]
 		}
 	},
 	"scripts": {
