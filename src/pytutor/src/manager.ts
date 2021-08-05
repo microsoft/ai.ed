@@ -14,6 +14,9 @@ export class Manager {
 
 		Manager.context.subscriptions.push(vscode.commands.registerCommand("python-tutor.beginner-mode", handleBeginnerMode));
 		Manager.context.subscriptions.push(vscode.commands.registerCommand("python-tutor.expert-mode", handleExpertMode));
+		Manager.context.subscriptions.push(vscode.commands.registerCommand('save_document', () => {
+			vscode.window.activeTextEditor?.document.save();
+		}));
 
 		if (mode === Modes.Beginner) {
 			handleBeginnerMode();

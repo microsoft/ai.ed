@@ -53,7 +53,21 @@ export class TutorCodeActionProvider implements vscode.CodeActionProvider {
 		let codeActions: vscode.CodeAction[] = [];
 		for (let diagnostic of context.diagnostics) {
 			let codeAction = this.repairEngine.diagnosticToCodeActionMap.get(diagnostic);
-			if (codeAction) {
+			if (codeAction) {				
+				codeAction.edit = new vscode.WorkspaceEdit();
+				codeAction.edit.replace(
+			  		document.uri,
+			  		new vscode.Range(
+						new vscode.Position(5, 15),
+						new vscode.Position(5, 17)
+			  		),
+			  	">="
+				);
+				
+				codeAction.command = {
+					command: 'save_document', 
+					title: codeAction.title
+				};
 				codeActions.push(codeAction);
 			}
 		}
