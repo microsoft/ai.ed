@@ -1,6 +1,6 @@
 x = input()
 y = input()
 
-x/y=a  
+x/y=a
 
 print(a)
