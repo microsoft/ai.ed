@@ -46,6 +46,114 @@ export class TutorCodeActionProvider implements vscode.CodeActionProvider {
 	public async update(document: vscode.TextDocument) {
 		let diagnostics = [];
 		this.codeActions = new Map();
+
+		if (document.fileName.includes("multiplication_table.py")){
+			let error = "8s";
+			let errorLine = 3;
+			
+			let line = document.lineAt(errorLine).text;
+			if (line.includes(error)) {
+				let start = line.indexOf(error);
+				let end = start + error.length;
+
+				const diagnostic = {
+					code: "",
+					message:
+					"Looks like you missed a binary operator (+, -, *, /) here\n"+
+					"'5x' does NOT mean 5 multipled by x, write '5 * x' instead!\n\n"+
+					"👉 The multiplication operator '*' multiplies two operands\n",
+					range: new vscode.Range(
+						new vscode.Position(errorLine, start),
+						new vscode.Position(errorLine, end)
+					),
+					severity: vscode.DiagnosticSeverity.Warning,
+					source: "PyTutor " + getModeIcon(this.context),
+				};
+
+				const action1 = new vscode.CodeAction(
+					"Replace with 8 * s",
+					vscode.CodeActionKind.QuickFix
+				);
+				
+				action1.edit = new vscode.WorkspaceEdit();
+				action1.edit.replace(
+					document.uri,
+					new vscode.Range(
+						new vscode.Position(errorLine, start),
+						new vscode.Position(errorLine, end)
+					),
+					"8 * s"
+				);				
+
+				let codeActionHash = document.uri.path + errorLine.toString();
+				this.codeActions.set(codeActionHash, [action1]);
+				diagnostics.push(diagnostic);
+			}
+		}
+
+		if (document.fileName.includes("equality.py")){
+			let errors = ["ab", "cd"];
+			let errorLines = [6, 6];
+			let corrections = ['a * b', 'c * d'];
+			let messages = [
+				"Looks like you missed a binary operator (+, -, *, /) here\n"+
+				"'xy' does NOT mean x multipled by y, write 'x * y' instead!\n\n"+
+				"👉 The multiplication operator '*' multiplies two operands\n",
+
+				"Looks like you missed a binary operator (+, -, *, /) here\n"+
+				"'xy' does NOT mean x multipled by y, write 'x * y' instead!\n\n"+
+				"👉 The multiplication operator '*' multiplies two operands\n",
+			]
+			let actionMessages = [
+				"Replace with a * b",
+				"Replace with c * d"
+			]
+
+			for (let i of [0, 1]){
+				let error = errors[i];
+				let errorLine = errorLines[i];
+				let correction = corrections[i];
+				let message = messages[i];
+				let actionMessage = actionMessages[i];
+
+				let line = document.lineAt(errorLine).text;
+				if (line.includes(error)) {
+					let start = line.indexOf(error);
+					let end = start + error.length;
+
+					const diagnostic = {
+						code: "",
+						message: message,						
+						range: new vscode.Range(
+							new vscode.Position(errorLine, start),
+							new vscode.Position(errorLine, end)
+						),
+						severity: vscode.DiagnosticSeverity.Warning,
+						source: "PyTutor " + getModeIcon(this.context),
+					};
+
+					const action = new vscode.CodeAction(
+						actionMessage,
+						vscode.CodeActionKind.QuickFix
+					);
+
+					action.edit = new vscode.WorkspaceEdit();
+					action.edit.replace(
+						document.uri,
+						new vscode.Range(
+							new vscode.Position(errorLine, start),
+							new vscode.Position(errorLine, end)
+						),
+						correction
+					);
+					action.diagnostics = [diagnostic];
+					let codeActionHash = document.uri.path + errorLine.toString();
+					this.codeActions.set(codeActionHash, [action]);
+					diagnostics.push(diagnostic);
+				}
+			}
+		}
+
 		if (document.fileName.includes("division.py")){	
 			let error = "x/y=a";
 			let errorLine = 3;
