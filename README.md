@@ -1,5 +1,7 @@
 # AI.Ed
 
+**NOTE: This project is now archived and no longer under development.**
+
 This is the AI for (programming) EDucation project.  The goal is to provide a great set of tools to provide AI-powered
 assistance to students taking programming classes and educators teaching them. Installation instructions are in 
 [BUILD.md](BUILD.md).
